@@ -1,0 +1,16 @@
+{
+  "name": "incompetent-approval-double-eecdz",
+  "productName": "incompetent-approval-double-eecdz",
+  "description": "My Electron application description",
+  "keywords": [],
+  "main": "./main.js",
+  "version": "1.0.0",
+  "author": "raeezjaldin",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "31.2.1"
+  }
+}

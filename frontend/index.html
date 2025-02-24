@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <nav class="navbar">
+    <div class="nav-links">
+        <button onclick="location.href='index.html'">Dashboard</button>
+        <button onclick="location.href='referred.html'">Referred</button>
+        <button onclick="location.href='upload.html'">Upload CSV</button>
+        <button onclick="location.href='reports.html'">Reports</button>
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="Search Patients ...">
+        <i class="fas fa-search"></i>
+    </div>
+</nav>
+
+    </nav>
+
+    <div class="container">
+        <h1>Welcome, Dr. James! Your Dashboard is Ready.</h1>
+        <p>It's Tuesday, 4th Feb 2025</p>
+        
+        <div class="cards">
+            <div class="card total">
+                <h2>Total Patients</h2>
+                <h3>1112</h3>
+                <button>View All <i class="fas fa-arrow-right"></i></button>
+            </div>
+            <div class="card referred">
+                <h2>Referred</h2>
+                <h3>567</h3>
+                <button>View All <i class="fas fa-arrow-right"></i></button>
+            </div>
+            <div class="card not-referred">
+                <h2>Not Referred</h2>
+                <h3>667</h3>
+                <button>View All <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
