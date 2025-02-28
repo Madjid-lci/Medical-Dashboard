@@ -1,0 +1,56 @@
+/* UploadPage.module.css */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .form {
+    margin-bottom: 20px;
+  }
+  
+  .fileInput {
+    margin-bottom: 15px;
+  }
+  
+  .uploadButton {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .uploadButton:hover {
+    background-color: #2563eb;
+  }
+  
+  .message {
+    margin-top: 15px;
+    color: #16a34a;
+  }
+  
+  .dataTable {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+  
+  .dataTable th,
+  .dataTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .dataTable th {
+    background-color: #f3f4f6;
+    font-weight: bold;
+  }
