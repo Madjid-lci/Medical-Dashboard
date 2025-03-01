@@ -1,8 +1,10 @@
+
 "use client";
 
-import React, { useState, ChangeEvent } from 'react';
-import { parse } from 'csv-parse/browser/esm';
-import styles from './UploadPage.module.css'; // Import your CSS module
+import React, { useState, ChangeEvent } from "react";
+import Layout from "../layout"; // Import the Layout component
+import Link from "next/link"; // Import the Link component
+import styles from "./UploadPage.module.css"; 
 
 // Define the structure of patient data
 interface PatientData {
@@ -16,7 +18,7 @@ interface PatientData {
 const UploadPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [data, setData] = useState<PatientData[]>([]);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
 
   // Handle file input change
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -25,41 +27,46 @@ const UploadPage: React.FC = () => {
     }
   };
 
-  // Handle CSV file upload and parsing
+  // Handle CSV file upload and parsing manually
   const handleUpload = () => {
     if (!file) {
-      setError('Please select a CSV file.');
+      setError("Please select a CSV file.");
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      parse(
-        text,
-        {
-          columns: true,
-          skip_empty_lines: true,
-        },
-        (err, output: PatientData[]) => {
-          if (err) {
-            setError('Error parsing CSV file.');
-            return;
-          }
+      const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+      
+      if (lines.length < 2) {
+        setError("CSV file is empty or missing data.");
+        return;
+      }
 
-          const requiredColumns = ['PatientID', 'Name', 'Age', 'Measurements', 'Referral'];
-          const hasAllColumns = requiredColumns.every((col) => col in output[0]);
+      const headers = lines[0].split(",").map((header) => header.trim());
+      const requiredColumns = ["PatientID", "Name", "Age", "Measurements", "Referral"];
 
-          if (!hasAllColumns) {
-            setError('Missing required columns.');
-            return;
-          }
+      // Check if all required columns exist
+      if (!requiredColumns.every((col) => headers.includes(col))) {
+        setError("Missing required columns.");
+        return;
+      }
 
-          setData(output);
-          setError('');
-        }
-      );
+      // Convert rows into objects
+      const parsedData: PatientData[] = lines.slice(1).map((line) => {
+        const values = line.split(",").map((value) => value.trim());
+        const obj: any = {};
+        headers.forEach((header, index) => {
+          obj[header] = values[index] || "";
+        });
+        return obj as PatientData;
+      });
+
+      setData(parsedData);
+      setError("");
     };
+
     reader.readAsText(file);
   };
 
@@ -67,20 +74,12 @@ const UploadPage: React.FC = () => {
     <div className={styles.container}>
       <h1 className={styles.header}>Upload CSV File</h1>
       <p className="mb-4">
-        Please upload a CSV file containing patient data with the following columns:{' '}
+        Please upload a CSV file containing patient data with the following columns:{" "}
         <strong>PatientID, Name, Age, Measurements, Referral</strong>.
       </p>
 
-      <input
-        type="file"
-        accept=".csv"
-        onChange={handleFileChange}
-        className={styles.fileInput}
-      />
-      <button
-        onClick={handleUpload}
-        className={styles.uploadButton}
-      >
+      <input type="file" accept=".csv" onChange={handleFileChange} className={styles.fileInput} />
+      <button onClick={handleUpload} className={styles.uploadButton}>
         Upload CSV
       </button>
 
@@ -103,9 +102,7 @@ const UploadPage: React.FC = () => {
               {data.map((row, index) => (
                 <tr key={index}>
                   {Object.values(row).map((value, i) => (
-                    <td key={i} className={styles.dataTable}>
-                      {value}
-                    </td>
+                    <td key={i} className={styles.dataTable}>{value}</td>
                   ))}
                 </tr>
               ))}

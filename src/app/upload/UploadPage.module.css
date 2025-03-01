@@ -7,11 +7,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Ensure it's at least the height of the viewport */
+  min-height: 50vh; /* Ensure it's at least the height of the viewport */
 }
 
 .header {
-  font-size: 24px;
+  font-size: 50px;
   font-weight: bold;
   margin-bottom: 20px;
 }

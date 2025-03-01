@@ -10,8 +10,8 @@ function createWindow() {
     },
   });
 
-  // Make sure your Next.js app is running at http://localhost:3000
-  win.loadURL('http://localhost:3000/upload'); 
+  // Load the root URL of your Next.js app
+  win.loadURL('http://localhost:3000'); // Change this to the root URL
 }
 
 app.whenReady().then(() => {
