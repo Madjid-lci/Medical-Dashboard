@@ -1,22 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaSearch, FaArrowRight } from "react-icons/fa";
 import styles from "./DoctorDashboard.module.css";
 
 const DoctorDashboard: React.FC = () => {
   const router = useRouter();
+  const [formattedDate, setFormattedDate] = useState("");
 
-  // Get the current date
-  const today = new Date();
-  const options: Intl.DateTimeFormatOptions = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
-  const formattedDate = today.toLocaleDateString("en-GB", options); // Example: "Tuesday, 4 February 2025"
+  useEffect(() => {
+    const today = new Date();
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    };
+    setFormattedDate(today.toLocaleDateString("en-GB", options));
+  }, []);
 
   return (
     <div className={styles.body}>
       <div className={styles.container}>
-        <h1>Welcome, Dr. James! Your Dashboard is Ready.</h1>
+        <h1>Welcome, Your Dashboard is Ready.</h1>
         <p>It's {formattedDate}</p>
 
         <div className={styles.cards}>

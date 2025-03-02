@@ -7,6 +7,14 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
+
+  background-image: url('CCU-BG.jpg');
+    background-size: cover; /* Ensures the image covers the whole background */
+    background-position: center;
+    background-attachment: fixed; /* Keeps the image fixed during scroll */
+
+
 }
 
 .layout {
@@ -25,7 +33,7 @@ body {
 .footer {
   text-align: center;
   padding: 20px;
-  background-color: white;
+  backdrop-filter: blur(2px); /* Applies the blur effect to the background */
   border-top: 1px solid #ddd;
   margin-top: auto;
 }
@@ -36,45 +44,6 @@ button {
   font-size: 1rem;
   cursor: pointer;
 }
-
-
-
-/* Navbar Styling 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: white;
-  padding: 20px 40px;
-  margin-bottom: 40px;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.nav-buttons button {
-  margin-right: 15px;
-  background-color: #888b8e;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.nav-buttons button:hover {
-  background-color: #b4bdc7;
-}
-
-.search-bar {
-  padding: 10px 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  width: 300px;
-  font-size: 16px;
-} */
-
 
 /* General Body Styles */
 .body {
@@ -118,7 +87,7 @@ button {
   background: #d9d9d9;
 }
 
-/* Search Bar */
+   
 .search-bar {
   padding: 8px 12px;
   border-radius: 20px;
@@ -126,4 +95,22 @@ button {
   outline: none;
   font-size: 14px;
   width: 200px;
+  background-image: url('search-icon.png'); /* Search icon URL */
+  background-size: 20px 20px; /* Size of the icon */
+  background-repeat: no-repeat;
+  background-position: right 10px center; /* Position the icon on the right side */
+  position: right;
+} 
+
+.searchrr-bar {
+  width: 300px;
+  padding: 10px 40px 10px 10px; /* Adds padding to the right for the icon */
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  background-image: url('search-icon.png'); /* Search icon URL */
+  background-size: 20px 20px; /* Size of the icon */
+  background-repeat: no-repeat;
+  background-position: 10px center; /* Position the icon inside the input */
 }

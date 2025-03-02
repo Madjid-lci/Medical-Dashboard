@@ -3,59 +3,7 @@
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f8f8;
-    min-height: 100vh;
-}
-
-/* Navbar */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #ffffff;
-    padding: 10px 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.navLinks {
-    display: flex;
-    gap: 10px;
-}
-
-.navButton {
-    background: none;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 8px 15px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease-in-out;
-}
-
-.navButton:hover {
-    background: #d9d9d9;
-}
-
-/* Search Bar */
-.searchBar {
-    display: flex;
-    align-items: center;
-    background: #f1f1f1;
-    padding: 8px 12px;
-    border-radius: 20px;
-}
-
-.searchBar input {
-    border: none;
-    outline: none;
-    background: none;
-    font-size: 14px;
-    padding: 5px;
-    margin-right: 5px;
-}
-
-.searchIcon {
-    color: #888;
+    min-height: 50vh;
 }
 
 /* Main Container */

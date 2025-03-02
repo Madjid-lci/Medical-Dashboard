@@ -26,7 +26,6 @@ const ReferralCard: React.FC<ReferralCardProps> = ({ title, description }) => {
   );
 };
 
-
 const DietitianDashboard: React.FC = () => {
   const urgentReferrals = [
     { title: "John Doe", description: "High-risk patient" },
@@ -42,31 +41,32 @@ const DietitianDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="dashboard">
+    <Layout> {/* Wrap everything in Layout */}
+      <div className="dashboard">
+        {/* Main Heading */}
+        <h1 className="dashboard-title">Patients Referred to Dietitian</h1>
 
-      {/* Main Heading */}
-      <h1 className="dashboard-title">Patients Referred to Dietitian</h1>
+        {/* Urgent Referrals Section */}
+        <section className="urgent-referrals">
+          <h2 className="section-title urgent">Urgent Referrals</h2>
+          <div className="referral-list">
+            {urgentReferrals.map((referral, index) => (
+              <ReferralCard key={index} {...referral} />
+            ))}
+          </div>
+        </section>
 
-      {/* Urgent Referrals Section */}
-      <section className="urgent-referrals">
-        <h2 className="section-title urgent">Urgent Referrals</h2>
-        <div className="referral-list">
-          {urgentReferrals.map((referral, index) => (
-            <ReferralCard key={index} {...referral} />
-          ))}
-        </div>
-      </section>
-
-      {/* All Referrals Section */}
-      <section className="all-referrals">
-        <h2 className="section-title">All Referrals</h2>
-        <div className="referral-list">
-          {allReferrals.map((referral, index) => (
-            <ReferralCard key={index} {...referral} />
-          ))}
-        </div>
-      </section>
-    </div>
+        {/* All Referrals Section */}
+        <section className="all-referrals">
+          <h2 className="section-title">All Referrals</h2>
+          <div className="referral-list">
+            {allReferrals.map((referral, index) => (
+              <ReferralCard key={index} {...referral} />
+            ))}
+          </div>
+        </section>
+      </div>
+    </Layout>
   );
 };
 
