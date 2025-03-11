@@ -1,0 +1,194 @@
+/* Dashboard Styling */
+.dashboard {
+  padding: 40px;
+  font-family: Arial, sans-serif;
+  min-height: 50vh;
+}
+
+.dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.dashboard-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.loading-message, .error-message, .no-data-message {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: red;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.patients-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px; /* Reduced font size */
+  text-align: center;
+}
+
+.patients-table th, 
+.patients-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.patients-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.even-row {
+  background-color: #fafafa;
+}
+
+.odd-row {
+  background-color: #ffffff;
+}
+
+.need-referral {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: bold;
+  background-color: #ffcc00;
+  color: #333;
+}
+
+.no-referral {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: bold;
+  background-color: #28a745;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .patients-table {
+    font-size: 10px;
+  }
+
+  .patients-table th, 
+  .patients-table td {
+    padding: 6px;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.pagination button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.pagination button:hover {
+  background-color: #0056b3;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+
+
+/* Main Title */
+.dashboard-title {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 0%;
+  margin-bottom: 50px;
+  color: #000000;
+}
+
+/* Referral Sections */
+.section-title {
+  font-size: 25px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.section-title.urgent {
+  color: #d9534f;
+}
+
+.referral-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+/* Referral Card Styling */
+.referral-card {
+  background-color: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.referral-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.card-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.description {
+  color: #777;
+}
+
+.quote {
+  display: none;
+}
