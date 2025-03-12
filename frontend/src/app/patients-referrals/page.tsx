@@ -4,18 +4,28 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import Layout from "../layout"; // Import Layout
 import "./page.lodel.css"; // Import styles
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000";
+const PATIENTS_PER_PAGE = 10; // Number of patients per page
 
 console.log("📡 Using Backend URL:", BACKEND_URL);
 
-const PATIENTS_PER_PAGE = 10; // Set pagination limit
-
 interface Patient {
   encounterId: number;
+  end_tidal_co2: number | null;
+  feed_vol: number | null;
+  feed_vol_adm: number | null;
   fio2: number | null;
-  resp_rate: number | null;
+  fio2_ratio: number | null;
+  insp_time: number | null;
   oxygen_flow_rate: number | null;
+  peep: number | null;
+  pip: number | null;
+  resp_rate: number | null;
+  sip: number | null;
+  tidal_vol: number | null;
+  tidal_vol_actual: number | null;
+  tidal_vol_kg: number | null;
+  tidal_vol_spon: number | null;
   bmi: number | null;
   referral: number | null;
 }
@@ -27,7 +37,7 @@ const PatientsReferrals: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ✅ Fetch Patient Data with Error Handling
+  // ✅ Fetch Patient Data
   const fetchPatients = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -94,7 +104,7 @@ const PatientsReferrals: React.FC = () => {
     };
   }, []);
 
-  // ✅ Pagination Logic
+  // ✅ Pagination logic
   const totalPages = Math.ceil(patients.length / PATIENTS_PER_PAGE);
   const indexOfLastPatient = currentPage * PATIENTS_PER_PAGE;
   const indexOfFirstPatient = indexOfLastPatient - PATIENTS_PER_PAGE;
@@ -118,24 +128,48 @@ const PatientsReferrals: React.FC = () => {
               <thead>
                 <tr>
                   <th>Encounter ID</th>
+                  <th>End Tidal CO2</th>
+                  <th>Feed Volume</th>
+                  <th>Feed Volume Admin</th>
                   <th>FIO2</th>
-                  <th>Respiratory Rate</th>
+                  <th>FIO2 Ratio</th>
+                  <th>Inspiratory Time</th>
                   <th>Oxygen Flow Rate</th>
+                  <th>PEEP</th>
+                  <th>PIP</th>
+                  <th>Respiratory Rate</th>
+                  <th>SIP</th>
+                  <th>Tidal Volume</th>
+                  <th>Tidal Volume Actual</th>
+                  <th>Tidal Vol/Kg</th>
+                  <th>Tidal Vol Spon</th>
                   <th>BMI</th>
-                  <th>Referral Status</th>
+                  <th>Referral</th>
                 </tr>
               </thead>
               <tbody>
                 {currentPatients.map((patient, index) => (
                   <tr key={index} className={index % 2 === 0 ? "even-row" : "odd-row"}>
                     <td>{patient.encounterId}</td>
+                    <td>{patient.end_tidal_co2 ?? "N/A"}</td>
+                    <td>{patient.feed_vol ?? "N/A"}</td>
+                    <td>{patient.feed_vol_adm ?? "N/A"}</td>
                     <td>{patient.fio2 ?? "N/A"}</td>
-                    <td>{patient.resp_rate ?? "N/A"}</td>
+                    <td>{patient.fio2_ratio ?? "N/A"}</td>
+                    <td>{patient.insp_time ?? "N/A"}</td>
                     <td>{patient.oxygen_flow_rate ?? "N/A"}</td>
+                    <td>{patient.peep ?? "N/A"}</td>
+                    <td>{patient.pip ?? "N/A"}</td>
+                    <td>{patient.resp_rate ?? "N/A"}</td>
+                    <td>{patient.sip ?? "N/A"}</td>
+                    <td>{patient.tidal_vol ?? "N/A"}</td>
+                    <td>{patient.tidal_vol_actual ?? "N/A"}</td>
+                    <td>{patient.tidal_vol_kg ?? "N/A"}</td>
+                    <td>{patient.tidal_vol_spon ?? "N/A"}</td>
                     <td>{patient.bmi ?? "N/A"}</td>
                     <td>
                       <span className={patient.referral === 1 ? "need-referral" : "no-referral"}>
-                        {patient.referral === 1 ? "✅ Need Referral" : "❌ No Referral"}
+                        {patient.referral === 1 ? "Need Referral" : "No Referral"}
                       </span>
                     </td>
                   </tr>
