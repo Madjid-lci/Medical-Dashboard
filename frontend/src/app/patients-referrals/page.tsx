@@ -27,24 +27,34 @@ interface Patient {
   tidal_vol_kg: number | null;
   tidal_vol_spon: number | null;
   bmi: number | null;
-  referral: number | null;
+  referral: number;
 }
 
 const PatientsReferrals: React.FC = () => {
+  const [filter, setFilter] = useState<"all" | "needReferral" | "noReferral">("all");
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [inputPage, setInputPage] = useState<string>("1"); // ✅ New input state
+  const [isEditingPage, setIsEditingPage] = useState(false); // ✅ New editing state
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ✅ Fetch Patient Data
+  const getFilteredPatients = () => {
+    if (filter === "needReferral") {
+      return patients.filter((patient) => patient.referral === 1);
+    } else if (filter === "noReferral") {
+      return patients.filter((patient) => patient.referral === 0);
+    }
+    return patients;
+  };
+
+  // ✅ Fetch Patient Data (fixed dependency issue)
   const fetchPatients = useCallback(async () => {
     setLoading(true);
     setError("");
 
     try {
-      console.log(`🔍 Fetching patient data from: ${BACKEND_URL}/patients`);
-
       const response = await fetch(`${BACKEND_URL}/patients`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -56,74 +66,139 @@ const PatientsReferrals: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("✅ API Response:", data);
-
       if (Array.isArray(data.patients) && data.patients.length > 0) {
         setPatients(data.patients);
         setError("");
 
-        // ✅ Stop auto-refresh if data is loaded
         if (refreshIntervalRef.current) {
           clearInterval(refreshIntervalRef.current);
           refreshIntervalRef.current = null;
-          console.log("⏸️ Auto-refresh stopped since data is loaded.");
         }
       } else {
         setPatients([]);
       }
     } catch (err: any) {
-      console.error("❌ Fetch failed:", err);
       setError("⚠️ Failed to fetch data. Check your connection & backend.");
       setPatients([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // ✅ Removed patients from dependencies
 
+  // ✅ Proper useEffect Dependency
   useEffect(() => {
     fetchPatients();
 
-    // ✅ Auto-Refresh **Only if No Data is Found**
     refreshIntervalRef.current = setInterval(() => {
       if (patients.length === 0) {
-        console.log("🔄 Auto-refreshing...");
         fetchPatients();
       } else {
         if (refreshIntervalRef.current) {
           clearInterval(refreshIntervalRef.current);
           refreshIntervalRef.current = null;
-          console.log("✅ Auto-refresh stopped since data is loaded.");
         }
       }
-    }, 5000); // Check every 5 seconds
+    }, 5000);
 
     return () => {
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current);
       }
     };
-  }, []);
+  }, [fetchPatients]); // ✅ Added fetchPatients to dependencies
 
-  // ✅ Pagination logic
-  const totalPages = Math.ceil(patients.length / PATIENTS_PER_PAGE);
+  // ✅ Reset to First Page on Filter Change
+  useEffect(() => {
+   setCurrentPage(1); // ✅ Reset to first page on filter change
+   setInputPage("1"); // ✅ Reset input value to 1
+  }, [filter]);
+
+  const filteredPatients = getFilteredPatients();
+  const totalPages = Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE);
   const indexOfLastPatient = currentPage * PATIENTS_PER_PAGE;
   const indexOfFirstPatient = indexOfLastPatient - PATIENTS_PER_PAGE;
-  const currentPatients = patients.slice(indexOfFirstPatient, indexOfLastPatient);
+  const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient);
+
+    useEffect(() => {
+      if (!isEditingPage) {
+        setInputPage(currentPage.toString());
+      }
+    }, [currentPage, isEditingPage]);  
+
+    // ✅ Handle Input Change and Submission
+    const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInputPage(e.target.value);
+    };
+  
+    const handlePageSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        const targetPage = parseInt(inputPage, 10);
+    
+        if (!isNaN(targetPage)) {
+          if (targetPage < 1) {
+            setCurrentPage(1); // ✅ Lower than 1 → Go to first page
+          } else if (targetPage > totalPages) {
+            setCurrentPage(totalPages); // ✅ Higher than total → Go to last page
+          } else {
+            setCurrentPage(targetPage);
+          }
+        } else {
+          setInputPage(currentPage.toString()); // ✅ Reset to current page if invalid
+        }
+    
+        setIsEditingPage(false);
+      }
+    };        
+  
+    const handlePageBlur = () => {
+      setIsEditingPage(false);
+      setInputPage(currentPage.toString());
+    };
+
+    const handlePageClick = () => {
+      setIsEditingPage(true);
+      setInputPage(""); // ✅ Clear input when clicked
+    };    
 
   return (
-    <Layout>
-      <div className="dashboard">
-        <h1 className="dashboard-title">Patients Referred to Dietitian</h1>
+<Layout>
+  <div className="dashboard">
+    <h1 className="dashboard-title">Patients Referred to Dietitian</h1>
 
-        {/* Show Loading Message */}
-        {loading && <p className="loading-message">⏳ Loading patient data...</p>}
+    {/* Show Loading Message */}
+    {loading && <p className="loading-message">⏳ Loading patient data...</p>}
 
-        {/* Show Error Message */}
-        {error && !loading && <p className="error-message">⚠️ {error}</p>}
+    {/* Show Error Message */}
+    {error && !loading && <p className="error-message">⚠️ {error}</p>}
 
-        {/* Display Data in a Table */}
-        {!loading && !error && patients.length > 0 ? (
-          <div className="table-container">
+    {/* Filter Buttons */}
+    <div className="filter-container">
+      <button
+        onClick={() => setFilter("all")}
+        className={`filter-button ${filter === "all" ? "active" : ""}`}
+      >
+        All Patients
+      </button>
+      <button
+        onClick={() => setFilter("needReferral")}
+        className={`filter-button ${filter === "needReferral" ? "active" : ""}`}
+      >
+        Needs Referral
+      </button>
+      <button
+        onClick={() => setFilter("noReferral")}
+        className={`filter-button ${filter === "noReferral" ? "active" : ""}`}
+      >
+        No Referral Needed
+      </button>
+    </div>
+
+    {/* Display Data in a Table */}
+    {!loading && !error && currentPatients.length > 0 ? (
+      <>
+        {/* Table Container */}
+        <div className="table-wrapper">
+          <div className="table-scroll-container">
             <table className="patients-table">
               <thead>
                 <tr>
@@ -144,7 +219,8 @@ const PatientsReferrals: React.FC = () => {
                   <th>Tidal Vol/Kg</th>
                   <th>Tidal Vol Spon</th>
                   <th>BMI</th>
-                  <th>Referral</th>
+                  {/* Sticky referral column */}
+                  <th className="sticky-column">Referral</th>
                 </tr>
               </thead>
               <tbody>
@@ -167,39 +243,65 @@ const PatientsReferrals: React.FC = () => {
                     <td>{patient.tidal_vol_kg ?? "N/A"}</td>
                     <td>{patient.tidal_vol_spon ?? "N/A"}</td>
                     <td>{patient.bmi ?? "N/A"}</td>
-                    <td>
+                    {/* Sticky referral column */}
+                    <td className="sticky-column">
                       <span className={patient.referral === 1 ? "need-referral" : "no-referral"}>
-                        {patient.referral === 1 ? "Need Referral" : "No Referral"}
+                        {patient.referral === 1 ? "Needs Referral" : "No Referral Needed"}
                       </span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-
-            {/* Pagination Controls */}
-            <div className="pagination">
-              <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
-                ⏮ First
-              </button>
-              <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-                ◀ Prev
-              </button>
-              <span>Page {currentPage} of {totalPages}</span>
-              <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-                Next ▶
-              </button>
-              <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
-                ⏭ Last
-              </button>
-            </div>
           </div>
-        ) : (
-          !loading && <p className="no-data-message">🔍 No referred patients available.</p>
-        )}
-      </div>
-    </Layout>
-  );
-};
+        </div>
+
+        {/* Pagination */}
+        <div className="pagination">
+          <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+            ⏮ First
+          </button>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            ◀ Prev
+          </button>
+          {isEditingPage ? (
+            <input
+              type="number"
+              value={inputPage}
+              onChange={handlePageChange}
+              onKeyDown={handlePageSubmit}
+              onBlur={handlePageBlur}
+              className="pagination-input"
+              autoFocus
+              min={1}
+              max={totalPages}
+            />
+          ) : (
+            <span onClick={handlePageClick} className="pagination-text">
+              Page {currentPage} of {totalPages}
+            </span>
+          )}
+
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next ▶
+          </button>
+          <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+            ⏭ Last
+          </button>
+        </div>
+      </>
+    ) : (
+      !loading && <p className="no-data-message">🔍 No referred patients available.</p>
+    )}
+  </div>
+</Layout>
+  ); 
+}; 
 
 export default PatientsReferrals;

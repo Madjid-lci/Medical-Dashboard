@@ -1,46 +1,106 @@
-/* Dashboard Styling */
+/* ========================
+   DASHBOARD STYLING
+======================== */
 .dashboard {
-  padding: 40px;
+  padding: 20px;
   font-family: Arial, sans-serif;
   min-height: 50vh;
 }
 
-.dashboard {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
 .dashboard-title {
   text-align: center;
-  font-size: 24px;
+  font-size: 48px;
   font-weight: bold;
   margin-bottom: 20px;
+  color: #000;
 }
 
-.loading-message, .error-message, .no-data-message {
+/* Loading, Error & No Data Message Styling */
+.loading-message,
+.error-message,
+.no-data-message {
   text-align: center;
   font-size: 16px;
   font-weight: bold;
   color: red;
 }
 
-.table-container {
+/* ========================
+   FILTER BUTTON STYLING
+======================== */
+.filter-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.filter-button:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+.filter-button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.filter-button:disabled {
+  background-color: #ccc;
+  color: #777;
+  cursor: not-allowed;
+}
+
+/* Responsive Button Styling */
+@media (max-width: 768px) {
+  .filter-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+/* ========================
+   TABLE STYLING
+======================== */
+.table-wrapper {
   width: 100%;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.table-scroll-container {
   overflow-x: auto;
-  margin-top: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-width: 100%;
 }
 
 .patients-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px; /* Reduced font size */
+  font-size: 12px;
   text-align: center;
+  background-color: #fafafa;
 }
 
-.patients-table th, 
+.patients-table th,
 .patients-table td {
   padding: 8px;
   border: 1px solid #ddd;
+  overflow-wrap: break-word; /* ✅ Fix for text overflow */
 }
 
 .patients-table th {
@@ -49,50 +109,105 @@
   text-transform: uppercase;
 }
 
-.even-row {
+/* ========================
+   ROW BACKGROUND COLOR FIX
+======================== */
+
+/* ✅ Background color for all EVEN rows (entire row) */
+.patients-table .even-row td {
   background-color: #fafafa;
 }
 
-.odd-row {
+/* ✅ Background color for all ODD rows (entire row) */
+.patients-table .odd-row td {
   background-color: #ffffff;
 }
 
-.need-referral {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 10px;
+/* ========================
+   STICKY REFERRAL COLUMN
+======================== */
+
+/* Sticky column for header */
+.patients-table th.sticky-column {
+  position: sticky;
+  right: 0;
+  background-color: #f5f5f5;
+  z-index: 3; /* ✅ Ensure header is rendered above rows */
   font-weight: bold;
-  background-color: #ffcc00;
-  color: #333;
+  min-width: 120px;
+  border-left: 1px solid #ddd;
+  border-bottom: 1px solid #ddd; /* ✅ Fix for missing header separator */
+  background-clip: padding-box;
+
+  /* ✅ Magic trick — simulate a shadow to reinforce the border */
+  box-shadow: inset 0px -1px 0px #ddd;
 }
 
+/* Sticky column for table rows */
+.patients-table td.sticky-column {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  font-weight: normal;
+  min-width: 120px;
+  text-align: center;
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+}
+
+/* ✅ Match sticky column background color to row background */
+.even-row .sticky-column {
+  background-color: #fafafa;
+}
+
+.odd-row .sticky-column {
+  background-color: #ffffff;
+}
+
+/* ========================
+   REFERRAL LABELS
+======================== */
+.need-referral,
 .no-referral {
   display: inline-block;
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 10px;
   font-weight: bold;
-  background-color: #28a745;
+}
+
+.need-referral {
+  background-color: #e81f1f;
   color: white;
 }
 
+.no-referral {
+  background-color: #36bd56;
+  color: white;
+}
+
+/* ========================
+   RESPONSIVE TABLE STYLING
+======================== */
 @media (max-width: 768px) {
   .patients-table {
     font-size: 10px;
   }
 
-  .patients-table th, 
+  .patients-table th,
   .patients-table td {
-    padding: 6px;
+    padding: 4px;
   }
 }
 
+/* ========================
+   PAGINATION STYLING
+======================== */
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .pagination button {
@@ -103,10 +218,13 @@
   cursor: pointer;
   border-radius: 5px;
   font-size: 12px;
+  line-height: 1.5;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .pagination button:hover {
   background-color: #0056b3;
+  transform: translateY(-1px);
 }
 
 .pagination button:disabled {
@@ -119,19 +237,9 @@
   font-weight: bold;
 }
 
-
-
-/* Main Title */
-.dashboard-title {
-  font-size: 48px;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 0%;
-  margin-bottom: 50px;
-  color: #000000;
-}
-
-/* Referral Sections */
+/* ========================
+   REFERRAL CARD STYLING
+======================== */
 .section-title {
   font-size: 25px;
   margin-bottom: 20px;
@@ -149,7 +257,6 @@
   margin-bottom: 50px;
 }
 
-/* Referral Card Styling */
 .referral-card {
   background-color: white;
   border-radius: 15px;
@@ -191,4 +298,37 @@
 
 .quote {
   display: none;
+}
+
+/* Page input styling */
+.pagination-input {
+  width: 50px;
+  padding: 4px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s;
+  height: 30px;
+  line-height: 30px;
+  vertical-align: middle;
+}
+
+.pagination-input:focus {
+  border-color: #007bff;
+}
+
+.pagination-text {
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+}
+
+.pagination-text:hover {
+  color: #007bff;
 }
