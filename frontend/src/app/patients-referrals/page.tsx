@@ -39,15 +39,12 @@ const PatientsReferrals: React.FC = () => {
   const [inputPage, setInputPage] = useState<string>("1"); // ✅ New input state
   const [isEditingPage, setIsEditingPage] = useState(false); // ✅ New editing state
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [exactMatch, setExactMatch] = useState(false);
 
-  const getFilteredPatients = () => {
-    if (filter === "needReferral") {
-      return patients.filter((patient) => patient.referral === 1);
-    } else if (filter === "noReferral") {
-      return patients.filter((patient) => patient.referral === 0);
-    }
-    return patients;
-  };
+
+  // ✅ State for Sorting and Searching
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Sorting state
+  const [searchQuery, setSearchQuery] = useState<string>(""); // Search state
 
   // ✅ Fetch Patient Data (fixed dependency issue)
   const fetchPatients = useCallback(async () => {
@@ -111,7 +108,38 @@ const PatientsReferrals: React.FC = () => {
   useEffect(() => {
    setCurrentPage(1); // ✅ Reset to first page on filter change
    setInputPage("1"); // ✅ Reset input value to 1
-  }, [filter]);
+  }, [filter, searchQuery, sortOrder, exactMatch]); // ✅ Added searchQuery to dependencies
+
+  const getFilteredPatients = () => {
+    let filteredData = patients;
+  
+    // ✅ Filter Logic
+    if (filter === "needReferral") {
+      filteredData = filteredData.filter((patient) => patient.referral === 1);
+    } else if (filter === "noReferral") {
+      filteredData = filteredData.filter((patient) => patient.referral === 0);
+    }
+  
+    // ✅ Search Logic
+    if (searchQuery) {
+      filteredData = filteredData.filter((patient) => {
+        if (exactMatch) {
+          // ✅ Exact Match Search
+          return patient.encounterId.toString() === searchQuery;
+        } else {
+          // ✅ Start Match Only (instead of includes)
+          return patient.encounterId.toString().startsWith(searchQuery);
+        }
+      });
+    }
+  
+    // ✅ Sorting Logic
+    filteredData.sort((a, b) =>
+      sortOrder === "asc" ? a.encounterId - b.encounterId : b.encounterId - a.encounterId
+    );
+  
+    return filteredData;
+  };  
 
   const filteredPatients = getFilteredPatients();
   const totalPages = Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE);
@@ -136,19 +164,19 @@ const PatientsReferrals: React.FC = () => {
     
         if (!isNaN(targetPage)) {
           if (targetPage < 1) {
-            setCurrentPage(1); // ✅ Lower than 1 → Go to first page
+            setCurrentPage(1);
           } else if (targetPage > totalPages) {
-            setCurrentPage(totalPages); // ✅ Higher than total → Go to last page
+            setCurrentPage(totalPages);
           } else {
             setCurrentPage(targetPage);
           }
         } else {
-          setInputPage(currentPage.toString()); // ✅ Reset to current page if invalid
+          setInputPage(currentPage.toString());
         }
     
         setIsEditingPage(false);
       }
-    };        
+    };           
   
     const handlePageBlur = () => {
       setIsEditingPage(false);
@@ -159,6 +187,11 @@ const PatientsReferrals: React.FC = () => {
       setIsEditingPage(true);
       setInputPage(""); // ✅ Clear input when clicked
     };    
+
+    // ✅ Handle Sorting (Ascending or Descending)
+  const handleSort = () => {
+  setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+};
 
   return (
 <Layout>
@@ -171,6 +204,7 @@ const PatientsReferrals: React.FC = () => {
     {/* Show Error Message */}
     {error && !loading && <p className="error-message">⚠️ {error}</p>}
 
+    <div className="control-container">
     {/* Filter Buttons */}
     <div className="filter-container">
       <button
@@ -192,6 +226,32 @@ const PatientsReferrals: React.FC = () => {
         No Referral Needed
       </button>
     </div>
+    {/* Sort & Search Buttons (Right) */}
+  <div className="sort-search-container">
+    {/* Search Box */}
+    <input
+      type="text"
+      placeholder="Search by ID"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="search-input"
+    />
+{/* Exact Match Checkbox */}
+<label className="exact-match-label">
+    <input
+      type="checkbox"
+      checked={exactMatch}
+      onChange={() => setExactMatch((prev) => !prev)}
+      className="exact-match-checkbox"
+    />
+    Exact Match
+  </label>
+    {/* Sort Button */}
+    <button onClick={handleSort} className="sort-button">
+      Sort {sortOrder === "asc" ? "↑" : "↓"}
+    </button>
+  </div>
+</div>
 
     {/* Display Data in a Table */}
     {!loading && !error && currentPatients.length > 0 ? (
