@@ -42,10 +42,77 @@ const PatientsReferrals: React.FC = () => {
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [exactMatch, setExactMatch] = useState(false);
 
+  // ✅ Temporary state for user input
+const [pendingRangeFilters, setPendingRangeFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
+
+// ✅ Applied state used for actual filtering
+const [appliedFilters, setAppliedFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
 
   // ✅ State for Sorting and Searching
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Sorting state
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search state
+
+  const [minMaxValues, setMinMaxValues] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
+
+  const calculateMinMaxValues = (patients: Patient[]) => {
+    const values: { [key in keyof Patient]?: [number | null, number | null] } = {};
+  
+    patients.forEach((patient) => {
+      for (const key in patient) {
+        const typedKey = key as keyof Patient;
+        const value = patient[typedKey] as number | null;
+  
+        if (value !== null) {
+          if (!values[typedKey]) {
+            values[typedKey] = [value, value];
+          } else {
+            values[typedKey] = [
+              Math.min(values[typedKey]![0]!, value),
+              Math.max(values[typedKey]![1]!, value),
+            ];
+          }
+        }
+      }
+    });
+  
+    setMinMaxValues(values);
+  };
+  
+  useEffect(() => {
+    if (patients.length > 0) {
+      calculateMinMaxValues(patients);
+    }
+  }, [patients]);  
+
+  const adjustRangeValues = (key: keyof Patient, index: number, value: string) => {
+    setRangeFilters((prev) => {
+      const updated = { ...prev };
+      const numericValue = value ? parseFloat(value) : null;
+  
+      if (!updated[key]) updated[key] = [null, null];
+  
+      // ✅ Adjust according to min/max values
+      if (numericValue !== null) {
+        if (index === 0) {
+          // Min value
+          updated[key]![0] = Math.max(
+            numericValue,
+            minMaxValues[key]?.[0] ?? numericValue
+          );
+        } else if (index === 1) {
+          // Max value
+          updated[key]![1] = Math.min(
+            numericValue,
+            minMaxValues[key]?.[1] ?? numericValue
+          );
+        }
+      } else {
+        updated[key]![index] = null;
+      }
+  
+      return updated;
+    });
+  };  
 
   // ✅ State for Min/Max Filtering
   const [rangeFilters, setRangeFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
@@ -120,43 +187,42 @@ const PatientsReferrals: React.FC = () => {
 
   const getFilteredPatients = () => {
     let filteredData = patients;
-
-    // ✅ Referral Filtering
+  
+    // ✅ Referral Filter Logic
     if (filter === "needReferral") {
       filteredData = filteredData.filter((patient) => patient.referral === 1);
     } else if (filter === "noReferral") {
       filteredData = filteredData.filter((patient) => patient.referral === 0);
     }
 
-    if (searchQuery) {
+    // ✅ Search Filter Logic
+  if (searchQuery) {
+    filteredData = filteredData.filter((patient) => {
+      if (exactMatch) {
+        return patient.encounterId.toString() === searchQuery;
+      } else {
+        return patient.encounterId.toString().startsWith(searchQuery);
+      }
+    });
+  }
+
+  // ✅ Range Filtering Using `appliedFilters`
+  for (const key in appliedFilters) {
+    const [min, max] = appliedFilters[key as keyof Patient] ?? [null, null];
+    if (min !== null || max !== null) {
       filteredData = filteredData.filter((patient) => {
-        if (exactMatch) {
-          return patient.encounterId.toString() === searchQuery;
-        } else {
-          return patient.encounterId.toString().startsWith(searchQuery);
-        }
+        const value = patient[key as keyof Patient] as number | null;
+        if (value === null) return false;
+        return (min === null || value >= min) && (max === null || value <= max);
       });
     }
-
-    // ✅ Range Filtering
-    for (const key in rangeFilters) {
-      const [min, max] = rangeFilters[key as keyof Patient] ?? [null, null];
-      if (min !== null || max !== null) {
-        filteredData = filteredData.filter((patient) => {
-          const value = patient[key as keyof Patient] as number | null;
-          if (value === null) return false;
-          return (min === null || value >= min) && (max === null || value <= max);
-        });
-      }
-    }
+  }
 
     return filteredData;
   }; 
 
   const filteredPatients = getFilteredPatients();
   const totalPages = Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE);
-  const indexOfLastPatient = currentPage * PATIENTS_PER_PAGE;
-  const indexOfFirstPatient = indexOfLastPatient - PATIENTS_PER_PAGE;
   const currentPatients = filteredPatients.slice(
     (currentPage - 1) * PATIENTS_PER_PAGE,
     currentPage * PATIENTS_PER_PAGE
@@ -214,9 +280,23 @@ const PatientsReferrals: React.FC = () => {
       setInputPage(""); // ✅ Clear input when clicked
     };    
 
-    // ✅ Handle Sorting (Ascending or Descending)
-  const handleSort = () => {
-  setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+// ✅ Update the temporary state only (without triggering actual filtering)
+const handlePendingRangeChange = (key: keyof Patient, index: number, value: string) => {
+  setPendingRangeFilters((prev) => {
+    const updated = JSON.parse(JSON.stringify(prev)); // ✅ Deep copy to prevent reference issues
+    const numericValue = value ? parseFloat(value) : null;
+
+    if (!updated[key]) updated[key] = [null, null];
+    updated[key][index] = numericValue;
+
+    return updated;
+  });
+};
+
+const handleApplyFilters = () => {
+  // ✅ Apply only when the button is clicked
+  setAppliedFilters(JSON.parse(JSON.stringify(pendingRangeFilters))); // ✅ Deep copy to separate state
+  setCurrentPage(1);
 };
 
   return (
@@ -282,33 +362,53 @@ const PatientsReferrals: React.FC = () => {
 
         {/* Advanced Filters */}
         {showFilterContainer && (
-          <div className="advanced-filter-container">
-            {Object.keys(rangeFilters).map((key) => (
-              <div key={key} className="filter-field">
-                <label>{key.replace(/_/g, " ")}</label>
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={rangeFilters[key as keyof Patient]?.[0] ?? ""}
-                  onChange={(e) =>
-                    handleRangeChange(key as keyof Patient, 0, e.target.value)
-                  }
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={rangeFilters[key as keyof Patient]?.[1] ?? ""}
-                  onChange={(e) =>
-                    handleRangeChange(key as keyof Patient, 1, e.target.value)
-                  }
-                />
-              </div>
-            ))}
-            <button onClick={handleAdvancedFiltering}>
-              Apply Filters
-            </button>
+  <div className="advanced-filter-container">
+    {[
+      { label: "Encounter ID", key: "encounterId" },
+      { label: "End Tidal CO2", key: "end_tidal_co2" },
+      { label: "Feed Volume", key: "feed_vol" },
+      { label: "Feed Volume Administered", key: "feed_vol_adm" },
+      { label: "FIO2", key: "fio2" },
+      { label: "FIO2 Ratio", key: "fio2_ratio" },
+      { label: "Inspiratory Time", key: "insp_time" },
+      { label: "Oxygen Flow Rate", key: "oxygen_flow_rate" },
+      { label: "PEEP", key: "peep" },
+      { label: "PIP", key: "pip" },
+      { label: "Respiratory Rate", key: "resp_rate" },
+      { label: "SIP", key: "sip" },
+      { label: "Tidal Volume", key: "tidal_vol" },
+      { label: "Tidal Volume Actual", key: "tidal_vol_actual" },
+      { label: "Tidal Volume Kg", key: "tidal_vol_kg" },
+      { label: "Tidal Volume Spon", key: "tidal_vol_spon" },
+      { label: "BMI", key: "bmi" }
+    ].map(({ label, key }) => (
+      <div key={key} className="filter-field">
+        <label>{label}</label>
+        <input
+              type="number"
+              placeholder={`Min (${minMaxValues[key as keyof Patient]?.[0] ?? '-'})`}
+              value={pendingRangeFilters[key as keyof Patient]?.[0] ?? ''}
+              onChange={(e) =>
+                handlePendingRangeChange(key as keyof Patient, 0, e.target.value)
+              }
+            />
+            <input
+              type="number"
+              placeholder={`Max (${minMaxValues[key as keyof Patient]?.[1] ?? '-'})`}
+              value={pendingRangeFilters[key as keyof Patient]?.[1] ?? ''}
+              onChange={(e) =>
+                handlePendingRangeChange(key as keyof Patient, 1, e.target.value)
+              }
+            />
           </div>
-        )}
+        ))}
+
+    {/* ✅ Apply Filters Button */}
+    <button onClick={handleApplyFilters} className="apply-filter-button">
+          Apply Filters
+        </button>
+      </div>
+    )}
 
         {/* Display Data in a Table */}
         {!loading && !error && currentPatients.length > 0 ? (

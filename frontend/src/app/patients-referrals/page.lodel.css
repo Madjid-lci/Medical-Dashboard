@@ -428,11 +428,12 @@
    ADVANCED FILTER CONTAINER
 ======================== */
 .advanced-filter-container {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* ✅ Ensures responsive grid */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
   margin-top: 15px;
-  padding: 12px;
+  padding: 10px;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -467,15 +468,17 @@
    APPLY FILTER BUTTON
 ======================== */
 .apply-filter-button {
-  padding: 10px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 12px 24px; /* ✅ Smaller size */
   background-color: #007bff;
   color: white;
-  font-size: 14px;
+  font-size: 14px; /* ✅ Smaller font size */
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  grid-column: span 2; /* ✅ Ensure button stretches across two columns */
 }
 
 .apply-filter-button:hover {
@@ -494,9 +497,5 @@
   .filter-field input {
     padding: 6px;
     font-size: 12px;
-  }
-
-  .apply-filter-button {
-    grid-column: span 1;
   }
 }
