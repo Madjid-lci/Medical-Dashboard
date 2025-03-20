@@ -205,53 +205,50 @@ const PatientsReferrals: React.FC = () => {
     {error && !loading && <p className="error-message">⚠️ {error}</p>}
 
     <div className="control-container">
-    {/* Filter Buttons */}
-    <div className="filter-container">
-      <button
-        onClick={() => setFilter("all")}
-        className={`filter-button ${filter === "all" ? "active" : ""}`}
-      >
-        All Patients
-      </button>
-      <button
-        onClick={() => setFilter("needReferral")}
-        className={`filter-button ${filter === "needReferral" ? "active" : ""}`}
-      >
-        Needs Referral
-      </button>
-      <button
-        onClick={() => setFilter("noReferral")}
-        className={`filter-button ${filter === "noReferral" ? "active" : ""}`}
-      >
-        No Referral Needed
-      </button>
+      {/* Filter Buttons */}
+      <div className="filter-container">
+        <button
+          onClick={() => setFilter("all")}
+          className={`filter-button ${filter === "all" ? "active" : ""}`}
+        >
+          All Patients
+        </button>
+        <button
+          onClick={() => setFilter("needReferral")}
+          className={`filter-button ${filter === "needReferral" ? "active" : ""}`}
+        >
+          Needs Referral
+        </button>
+        <button
+          onClick={() => setFilter("noReferral")}
+          className={`filter-button ${filter === "noReferral" ? "active" : ""}`}
+        >
+          No Referral Needed
+        </button>
+      </div>
+
+      {/* Sort & Search Buttons (Right) */}
+      <div className="sort-search-container">
+        {/* Search Box */}
+        <input
+          type="text"
+          placeholder="Search by ID"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+        {/* Exact Match Checkbox */}
+        <label className="exact-match-label">
+          <input
+            type="checkbox"
+            checked={exactMatch}
+            onChange={() => setExactMatch((prev) => !prev)}
+            className="exact-match-checkbox"
+          />
+          Exact Match
+        </label>
+      </div>
     </div>
-    {/* Sort & Search Buttons (Right) */}
-  <div className="sort-search-container">
-    {/* Search Box */}
-    <input
-      type="text"
-      placeholder="Search by ID"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="search-input"
-    />
-{/* Exact Match Checkbox */}
-<label className="exact-match-label">
-    <input
-      type="checkbox"
-      checked={exactMatch}
-      onChange={() => setExactMatch((prev) => !prev)}
-      className="exact-match-checkbox"
-    />
-    Exact Match
-  </label>
-    {/* Sort Button */}
-    <button onClick={handleSort} className="sort-button">
-      Sort {sortOrder === "asc" ? "↑" : "↓"}
-    </button>
-  </div>
-</div>
 
     {/* Display Data in a Table */}
     {!loading && !error && currentPatients.length > 0 ? (
@@ -281,6 +278,8 @@ const PatientsReferrals: React.FC = () => {
                   <th>BMI</th>
                   {/* Sticky referral column */}
                   <th className="sticky-column">Referral</th>
+                  {/* NEW Sticky Display More Data column */}
+                  <th className="sticky-column more-data-column">Display More Data</th>
                 </tr>
               </thead>
               <tbody>
@@ -309,13 +308,17 @@ const PatientsReferrals: React.FC = () => {
                         {patient.referral === 1 ? "Needs Referral" : "No Referral Needed"}
                       </span>
                     </td>
+                    {/* NEW Sticky "More" column */}
+                    <td className="sticky-column more-data-column">
+                      <a href="#" className="more-link">
+                        More
+                      </a>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
-
         {/* Pagination */}
         <div className="pagination">
           <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
@@ -355,11 +358,12 @@ const PatientsReferrals: React.FC = () => {
             ⏭ Last
           </button>
         </div>
+      </div>
       </>
     ) : (
       !loading && <p className="no-data-message">🔍 No referred patients available.</p>
     )}
-  </div>
+</div>
 </Layout>
   ); 
 }; 

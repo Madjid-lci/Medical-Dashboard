@@ -48,8 +48,7 @@
 /* ========================
    SEARCH & SORT
 ======================== */
-.search-input,
-.sort-button {
+.search-input {
   padding: 6px 12px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -60,22 +59,6 @@
 
 .search-input:focus {
   border-color: #007bff;
-}
-
-.sort-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.sort-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-1px);
-}
-
-.sort-button:active {
-  transform: translateY(0);
 }
 
 /* Exact Match Checkbox */
@@ -187,14 +170,10 @@
 .patients-table th.sticky-column,
 .patients-table td.sticky-column {
   position: sticky;
-  right: 0;
+  right: 150px; /* ✅ Positioned BEFORE the "More" column */
   background-color: #f5f5f5;
   z-index: 3;
   min-width: 120px;
-  border-left: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-  background-clip: padding-box;
-  box-shadow: inset 0px -1px 0px #ddd;
 }
 
 .even-row .sticky-column {
@@ -225,6 +204,43 @@
 .no-referral {
   background-color: #36bd56;
   color: white;
+}
+
+/* ========================
+   NEW STICKY "DISPLAY MORE DATA" COLUMN
+======================== */
+.patients-table th.more-data-column,
+.patients-table td.more-data-column {
+  position: sticky;
+  right: 0; /* ✅ Positioned AFTER the "Referral" column */
+  background-color: #f5f5f5;
+  z-index: 2;
+  min-width: 150px;
+  text-align: center;
+  
+  /* ✅ Add the separator here to avoid overlap */
+  border-left: 1px solid #ccc;
+}
+
+.even-row .more-data-column {
+  background-color: #fafafa;
+}
+
+.odd-row .more-data-column {
+  background-color: #ffffff;
+}
+
+/* ✅ "More" Link Styling */
+.more-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s ease;
+}
+
+.more-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
 }
 
 /* ========================
