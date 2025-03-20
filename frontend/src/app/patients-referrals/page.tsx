@@ -41,6 +41,7 @@ const PatientsReferrals: React.FC = () => {
   const [showFilterContainer, setShowFilterContainer] = useState(false); // ✅ New state for filter container
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [exactMatch, setExactMatch] = useState(false);
+  const [rawInput, setRawInput] = useState<{ [key in keyof Patient]?: [string, string] }>({});
 
   // ✅ Temporary state for user input
 const [pendingRangeFilters, setPendingRangeFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
@@ -284,9 +285,22 @@ const [appliedFilters, setAppliedFilters] = useState<{ [key in keyof Patient]?: 
 const handlePendingRangeChange = (key: keyof Patient, index: number, value: string) => {
   setPendingRangeFilters((prev) => {
     const updated = JSON.parse(JSON.stringify(prev)); // ✅ Deep copy to prevent reference issues
-    const numericValue = value ? parseFloat(value) : null;
+    let numericValue = value ? parseFloat(value) : null;
 
     if (!updated[key]) updated[key] = [null, null];
+
+    // ✅ Adjust according to min/max values immediately in the input bar
+    if (numericValue !== null) {
+      if (index === 0) {
+        // Min value - Round to min if it's smaller than allowed value
+        numericValue = Math.max(numericValue, minMaxValues[key]?.[0] ?? numericValue);
+      } else if (index === 1) {
+        // Max value - Round to max if it's larger than allowed value
+        numericValue = Math.min(numericValue, minMaxValues[key]?.[1] ?? numericValue);
+      }
+    }
+
+    // ✅ Update the corrected value in the input bar (but NOT trigger filtering)
     updated[key][index] = numericValue;
 
     return updated;
@@ -297,6 +311,62 @@ const handleApplyFilters = () => {
   // ✅ Apply only when the button is clicked
   setAppliedFilters(JSON.parse(JSON.stringify(pendingRangeFilters))); // ✅ Deep copy to separate state
   setCurrentPage(1);
+};
+
+const handleRawInputChange = (key: keyof Patient, index: number, value: string) => {
+  setRawInput((prev) => {
+    const updated = { ...prev };
+    if (!updated[key]) updated[key] = ["", ""];
+    updated[key][index] = value;
+    return updated;
+  });
+};
+
+const handleRawInputBlur = (key: keyof Patient, index: number) => {
+  setPendingRangeFilters((prev) => {
+    const updated = { ...prev };
+
+    // Take both values first
+    let minValue = updated[key]?.[0] ?? null;
+    let maxValue = updated[key]?.[1] ?? null;
+
+    if (rawInput[key]?.[0] !== undefined) {
+      minValue = parseFloat(rawInput[key]![0] || "") || null;
+    }
+    if (rawInput[key]?.[1] !== undefined) {
+      maxValue = parseFloat(rawInput[key]![1] || "") || null;
+    }
+
+    // ✅ Adjust based on allowed min/max range
+    if (minValue !== null) {
+      minValue = Math.max(minValue, minMaxValues[key]?.[0] ?? minValue);
+    }
+    if (maxValue !== null) {
+      maxValue = Math.min(maxValue, minMaxValues[key]?.[1] ?? maxValue);
+    }
+
+    // ✅ If min > max → SWAP THEM PROPERLY
+    if (minValue !== null && maxValue !== null && minValue > maxValue) {
+      const temp = minValue;
+      minValue = maxValue;
+      maxValue = temp;
+    }
+
+    // ✅ Update state with corrected values
+    updated[key] = [minValue, maxValue];
+
+    // ✅ Sync corrected value to `rawInput`
+    setRawInput((prev) => {
+      const newRawInput = { ...prev };
+      newRawInput[key]![0] =
+        minValue !== null ? minValue.toString() : "";
+      newRawInput[key]![1] =
+        maxValue !== null ? maxValue.toString() : "";
+      return newRawInput;
+    });
+
+    return updated;
+  });
 };
 
   return (
@@ -364,7 +434,6 @@ const handleApplyFilters = () => {
         {showFilterContainer && (
   <div className="advanced-filter-container">
     {[
-      { label: "Encounter ID", key: "encounterId" },
       { label: "End Tidal CO2", key: "end_tidal_co2" },
       { label: "Feed Volume", key: "feed_vol" },
       { label: "Feed Volume Administered", key: "feed_vol_adm" },
@@ -385,21 +454,23 @@ const handleApplyFilters = () => {
       <div key={key} className="filter-field">
         <label>{label}</label>
         <input
-              type="number"
-              placeholder={`Min (${minMaxValues[key as keyof Patient]?.[0] ?? '-'})`}
-              value={pendingRangeFilters[key as keyof Patient]?.[0] ?? ''}
-              onChange={(e) =>
-                handlePendingRangeChange(key as keyof Patient, 0, e.target.value)
-              }
-            />
-            <input
-              type="number"
-              placeholder={`Max (${minMaxValues[key as keyof Patient]?.[1] ?? '-'})`}
-              value={pendingRangeFilters[key as keyof Patient]?.[1] ?? ''}
-              onChange={(e) =>
-                handlePendingRangeChange(key as keyof Patient, 1, e.target.value)
-              }
-            />
+  type="number"
+  placeholder={`Min (${minMaxValues[key as keyof Patient]?.[0] ?? '-'})`}
+  value={rawInput[key as keyof Patient]?.[0] ?? ''}
+  onChange={(e) =>
+    handleRawInputChange(key as keyof Patient, 0, e.target.value)
+  }
+  onBlur={() => handleRawInputBlur(key as keyof Patient, 0)} // ✅ Trigger rounding on blur
+/>
+<input
+  type="number"
+  placeholder={`Max (${minMaxValues[key as keyof Patient]?.[1] ?? '-'})`}
+  value={rawInput[key as keyof Patient]?.[1] ?? ''}
+  onChange={(e) =>
+    handleRawInputChange(key as keyof Patient, 1, e.target.value)
+  }
+  onBlur={() => handleRawInputBlur(key as keyof Patient, 1)} // ✅ Trigger rounding on blur
+/>
           </div>
         ))}
 
