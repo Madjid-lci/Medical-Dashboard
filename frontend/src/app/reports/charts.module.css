@@ -1,0 +1,42 @@
+.chartContainer {
+  display: flex;
+  justify-content: center; /* Center the entire flex container horizontally */
+  align-items: flex-start;  /* Align items at the top */
+  gap: 32px; /* Space between the two charts */
+  padding: 20px;
+  background-color: transparent;
+  flex-wrap: wrap; /* Optional: Wrap on smaller screens */
+  min-height: 100vh;
+}
+
+.chartWrapper {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 600px; /* Adjust width */
+  text-align: center;
+}
+
+.chartCanvas {
+  width: 90%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.chartTitle {
+  text-align: center;
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+
+/* === Optional Message (No Data) === */
+.message {
+  text-align: center;
+  color: #888;
+  margin-top: 2rem;
+  font-style: italic;
+}

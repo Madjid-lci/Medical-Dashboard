@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaSearch, FaArrowRight } from "react-icons/fa";
-import styles from "./DoctorDashboard.module.css";
+import styles from "./home.module.css";
 
 const DoctorDashboard: React.FC = () => {
   const router = useRouter();

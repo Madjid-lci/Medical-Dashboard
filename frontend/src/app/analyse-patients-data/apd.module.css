@@ -1,0 +1,77 @@
+/* UploadPage.module.css */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 50vh;
+}
+
+.header {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 20px;
+  color: #000000;
+}
+
+.instructions {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.fileInput {
+  margin-bottom: 15px;
+}
+
+.uploadButton {
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.uploadButton:hover {
+  background-color: #2563eb;
+}
+
+.errorMessage {
+  margin-top: 15px;
+  color: red;
+}
+
+.dataContainer {
+  width: 100%;
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.dataHeader {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.dataTable th,
+.dataTable td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.dataTable th {
+  background-color: #f3f4f6;
+  font-weight: bold;
+}
