@@ -221,7 +221,7 @@ const mlFeatureChartOptions = {
       {/* Key Features Mixed Chart */}
       <div className={styles.chartWrapper}>
         <h2 className={styles.chartTitle}>Key Patient Features & Referral Rate</h2>
-        <div style={{ maxWidth: "700px", height: "400px" }}>
+        <div style={{ maxWidth: "1000px", height: "700px", width: "100%" }}>
           <Bar data={mlFeatureChartData as any} options={mlFeatureChartOptions} />
         </div>
       </div>

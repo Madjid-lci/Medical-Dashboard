@@ -11,7 +11,7 @@ function createWindow() {
   });
 
   // Load the root URL of your Next.js app
-  win.loadURL('http://localhost:3000'); // Change this to the root URL
+  win.loadURL('http://localhost:3000/upload'); // Change this to the root URL
 }
 
 app.whenReady().then(() => {

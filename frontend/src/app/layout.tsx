@@ -22,8 +22,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link href="/analyse-patients-data"><button>Analyse Patients Data</button></Link>
                 <Link href="/upload"><button>Upload CSV</button></Link>
                 <Link href="/reports"><button>Reports</button></Link>
+                <Link href="/help"><button>Help</button></Link>
               </div>
-              <input type="text" placeholder="Search Patients..." className="search-bar" />
             </nav>
           </header>
 

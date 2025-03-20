@@ -2,10 +2,10 @@
   display: flex;
   justify-content: center; /* Center the entire flex container horizontally */
   align-items: flex-start;  /* Align items at the top */
-  gap: 32px; /* Space between the two charts */
+  gap: 32px; /* Space between the charts */
   padding: 20px;
   background-color: transparent;
-  flex-wrap: wrap; /* Optional: Wrap on smaller screens */
+  flex-wrap: wrap; /* Allow wrapping of charts on smaller screens */
   min-height: 100vh;
 }
 
@@ -14,15 +14,53 @@
   padding: 24px;
   border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  width: 100%;
-  max-width: 600px; /* Adjust width */
+  width: 90%; /* Allow more width */
+  max-width: 1200px; /* Increase max width */
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .chartCanvas {
-  width: 90%;
-  max-width: 500px;
-  margin: 0 auto;
+  width: 100%;
+  height: 600px !important; /* Make the chart taller */
+  max-width: 1100px; /* Allow it to grow */
+}
+
+/* Referral Pie Chart (Left side) */
+.chartWrapper:first-child {
+  flex: 2;  /* Make the left chart (Referral Pie Chart) larger */
+}
+
+.chartWrapper:first-child .chartCanvas {
+  width: 100%;
+  max-width: 700px;  /* Set the maximum width for the pie chart */
+  height: 500px;  /* Set a fixed height for the pie chart */
+}
+
+/* Key Patient Features & Referral Rate (Right side) */
+.chartWrapper:nth-child(2) {
+  flex: 2;  /* Make the right chart (Key Patient Features) larger */
+}
+
+.chartWrapper:nth-child(2) .chartCanvas {
+  width: 100%;
+  max-width: 900px;  /* Keep this chart with a smaller width */
+  height: 400px;  /* Set height for the second chart */
+}
+
+/* Patients Missing Data Overview (Bottom) */
+.chartWrapper:nth-child(3) {
+  width: 100%;  /* Full width for the bottom chart */
+  display: flex;
+  justify-content: center;
+}
+
+.chartWrapper:nth-child(3) .chartCanvas {
+  width: 100%;  /* Full width for the bar chart */
+  max-width: 1000px;  /* Optional: Set a max-width for the bar chart */
+  height: 400px;  /* Set height for the bar chart */
 }
 
 .chartTitle {
@@ -31,7 +69,6 @@
   font-size: 1.2rem;
   margin-bottom: 1rem;
 }
-
 
 /* === Optional Message (No Data) === */
 .message {
