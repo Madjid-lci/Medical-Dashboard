@@ -199,28 +199,6 @@
 }
 
 /* ========================
-   REFERRAL LABELS
-======================== */
-.need-referral,
-.no-referral {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-.need-referral {
-  background-color: #e81f1f;
-  color: white;
-}
-
-.no-referral {
-  background-color: #36bd56;
-  color: white;
-}
-
-/* ========================
    NEW STICKY "DISPLAY MORE DATA" COLUMN
 ======================== */
 .patients-table th.more-data-column,
@@ -481,9 +459,11 @@
    APPLY FILTER BUTTON
 ======================== */
 .apply-filter-button {
-  position: absolute;
-  bottom: 10px; /* ✅ Align to the bottom with padding */
-  right: 10px; /* ✅ Align to the right with padding */
+  position: relative; /* ✅ Make it relative to stay in the same layer */
+  margin-top: 20px; /* ✅ Create space between the button and content */
+  margin-bottom: 10px; /* ✅ Ensure it aligns well within the container */
+  margin-left: 1215px; /* ✅ Align the button to the right */
+  margin-right: -1215px; /* ✅ Align the button to the right */
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
