@@ -283,24 +283,31 @@ const [appliedFilters, setAppliedFilters] = useState<{ [key in keyof Patient]?: 
 
 // ✅ Update the temporary state only (without triggering actual filtering)
 const handlePendingRangeChange = (key: keyof Patient, index: number, value: string) => {
+  // ✅ Update raw input (display value)
+  setRawInput((prev) => {
+    const updated = { ...prev };
+    if (!updated[key]) updated[key] = ["", ""];
+    updated[key][index] = value;
+    return updated;
+  });
+
+  // ✅ Update pending state (for backend use)
   setPendingRangeFilters((prev) => {
-    const updated = JSON.parse(JSON.stringify(prev)); // ✅ Deep copy to prevent reference issues
+    const updated = JSON.parse(JSON.stringify(prev)); // Deep copy to avoid reference issues
     let numericValue = value ? parseFloat(value) : null;
 
     if (!updated[key]) updated[key] = [null, null];
 
-    // ✅ Adjust according to min/max values immediately in the input bar
     if (numericValue !== null) {
       if (index === 0) {
-        // Min value - Round to min if it's smaller than allowed value
+        // Min value — Clamp to allowed minimum
         numericValue = Math.max(numericValue, minMaxValues[key]?.[0] ?? numericValue);
       } else if (index === 1) {
-        // Max value - Round to max if it's larger than allowed value
+        // Max value — Clamp to allowed maximum
         numericValue = Math.min(numericValue, minMaxValues[key]?.[1] ?? numericValue);
       }
     }
 
-    // ✅ Update the corrected value in the input bar (but NOT trigger filtering)
     updated[key][index] = numericValue;
 
     return updated;
@@ -308,25 +315,18 @@ const handlePendingRangeChange = (key: keyof Patient, index: number, value: stri
 };
 
 const handleApplyFilters = () => {
-  // ✅ Apply only when the button is clicked
-  setAppliedFilters(JSON.parse(JSON.stringify(pendingRangeFilters))); // ✅ Deep copy to separate state
-  setCurrentPage(1);
-};
+  setAppliedFilters(pendingRangeFilters); // ✅ Confirm and apply filters
+  setCurrentPage(1); // ✅ Reset to the first page after filtering
 
-const handleRawInputChange = (key: keyof Patient, index: number, value: string) => {
-  setRawInput((prev) => {
-    const updated = { ...prev };
-    if (!updated[key]) updated[key] = ["", ""];
-    updated[key][index] = value;
-    return updated;
-  });
+  // ✅ Clear the input values WITHOUT resetting applied filters
+  setRawInput({});
 };
 
 const handleRawInputBlur = (key: keyof Patient, index: number) => {
   setPendingRangeFilters((prev) => {
     const updated = { ...prev };
 
-    // Take both values first
+    // ✅ Get existing values
     let minValue = updated[key]?.[0] ?? null;
     let maxValue = updated[key]?.[1] ?? null;
 
@@ -337,7 +337,7 @@ const handleRawInputBlur = (key: keyof Patient, index: number) => {
       maxValue = parseFloat(rawInput[key]![1] || "") || null;
     }
 
-    // ✅ Adjust based on allowed min/max range
+    // ✅ Adjust based on allowed range
     if (minValue !== null) {
       minValue = Math.max(minValue, minMaxValues[key]?.[0] ?? minValue);
     }
@@ -345,7 +345,7 @@ const handleRawInputBlur = (key: keyof Patient, index: number) => {
       maxValue = Math.min(maxValue, minMaxValues[key]?.[1] ?? maxValue);
     }
 
-    // ✅ If min > max → SWAP THEM PROPERLY
+    // ✅ If min > max → swap them
     if (minValue !== null && maxValue !== null && minValue > maxValue) {
       const temp = minValue;
       minValue = maxValue;
@@ -358,10 +358,8 @@ const handleRawInputBlur = (key: keyof Patient, index: number) => {
     // ✅ Sync corrected value to `rawInput`
     setRawInput((prev) => {
       const newRawInput = { ...prev };
-      newRawInput[key]![0] =
-        minValue !== null ? minValue.toString() : "";
-      newRawInput[key]![1] =
-        maxValue !== null ? maxValue.toString() : "";
+      newRawInput[key]![0] = minValue !== null ? minValue.toString() : "";
+      newRawInput[key]![1] = maxValue !== null ? maxValue.toString() : "";
       return newRawInput;
     });
 
@@ -458,19 +456,20 @@ const handleRawInputBlur = (key: keyof Patient, index: number) => {
   placeholder={`Min (${minMaxValues[key as keyof Patient]?.[0] ?? '-'})`}
   value={rawInput[key as keyof Patient]?.[0] ?? ''}
   onChange={(e) =>
-    handleRawInputChange(key as keyof Patient, 0, e.target.value)
+    handlePendingRangeChange(key as keyof Patient, 0, e.target.value) // ✅ FIXED HERE
   }
-  onBlur={() => handleRawInputBlur(key as keyof Patient, 0)} // ✅ Trigger rounding on blur
+  onBlur={() => handleRawInputBlur(key as keyof Patient, 0)}
 />
 <input
   type="number"
   placeholder={`Max (${minMaxValues[key as keyof Patient]?.[1] ?? '-'})`}
   value={rawInput[key as keyof Patient]?.[1] ?? ''}
   onChange={(e) =>
-    handleRawInputChange(key as keyof Patient, 1, e.target.value)
+    handlePendingRangeChange(key as keyof Patient, 1, e.target.value) // ✅ FIXED HERE
   }
-  onBlur={() => handleRawInputBlur(key as keyof Patient, 1)} // ✅ Trigger rounding on blur
+  onBlur={() => handleRawInputBlur(key as keyof Patient, 1)}
 />
+
           </div>
         ))}
 
