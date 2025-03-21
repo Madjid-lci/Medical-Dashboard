@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Layout from "../layout"; // Import Layout
 import "./page.lodel.css"; // Import styles
+import Modal from "./modal"; // ✅ Import Modal
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000";
 const PATIENTS_PER_PAGE = 10; // Number of patients per page
@@ -43,11 +44,27 @@ const PatientsReferrals: React.FC = () => {
   const [exactMatch, setExactMatch] = useState(false);
   const [rawInput, setRawInput] = useState<{ [key in keyof Patient]?: [string, string] }>({});
 
-  // ✅ Temporary state for user input
-const [pendingRangeFilters, setPendingRangeFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
+   // ✅ Open Modal with patient data
+   const handleOpenModal = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsModalOpen(true);
+  };
 
-// ✅ Applied state used for actual filtering
-const [appliedFilters, setAppliedFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
+  // ✅ Close Modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPatient(null);
+  };
+
+  // ✅ State to control the modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+
+  // ✅ Temporary state for user input
+  const [pendingRangeFilters, setPendingRangeFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
+
+  // ✅ Applied state used for actual filtering
+  const [appliedFilters, setAppliedFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
 
   // ✅ State for Sorting and Searching
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Sorting state
@@ -508,7 +525,15 @@ const handleRawInputBlur = (key: keyof Patient, index: number) => {
                         <td>{patient.resp_rate ?? "N/A"}</td>
                         <td>{patient.bmi ?? "N/A"}</td>
                         <td className="sticky-column more-data-column">
-                          <a href="#" className="more-link">
+                  {/* ✅ Open the Modal */}
+                  <a
+                    href="#"
+                    className="more-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOpenModal(patient);
+                    }}
+                  >
                             More
                           </a>
                         </td>
@@ -522,7 +547,6 @@ const handleRawInputBlur = (key: keyof Patient, index: number) => {
                   </tbody>
                 </table>
               </div>
-
               {/* Pagination */}
               <div className="pagination">
                 <button
@@ -578,6 +602,12 @@ const handleRawInputBlur = (key: keyof Patient, index: number) => {
             </p>
           )
         )}
+        {/* ✅ Modal is Now Cleanly Handled in `Modal.tsx` */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          selectedPatient={selectedPatient}
+        />
       </div>
     </Layout>
   );
