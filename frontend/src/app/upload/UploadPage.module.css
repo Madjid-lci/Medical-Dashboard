@@ -1,77 +1,89 @@
-/* UploadPage.module.css */
+/* Upload Page Container */
 .container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-height: 50vh;
+  align-items: flex-start; /* Align text to the left */
 }
 
+/* Main Heading */
 .header {
   font-size: 48px;
   font-weight: bold;
-  text-align: center;
-  margin-top: 5%;
-  margin-bottom: 20px;
+  text-align: left;
+  margin-bottom: 10px;
   color: #000000;
 }
 
+/* Description Text */
 .instructions {
-  margin-bottom: 15px;
-  text-align: center;
+  font-size: 18px;
+  text-align: left;
+  color: #333;
+  margin-bottom: 20px;
+  line-height: 1.6;
 }
 
-.fileInput {
-  margin-bottom: 15px;
+/* File Input Label */
+.fileLabel {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
 }
 
-.uploadButton {
-  background-color: #3b82f6;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+/* File Input Container */
+.fileInputContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 15px;
+  width: 100%;
+  max-width: 350px;
+  background: #f9f9f9;
   cursor: pointer;
-  transition: background 0.3s ease-in-out;
+}
+
+/* Hidden File Input */
+.fileInput {
+  flex-grow: 1;
+  border: none;
+  font-size: 16px;
+  background: transparent;
+  outline: none;
+}
+
+/* File Icon */
+.fileIcon {
+  font-size: 20px;
+  color: #000000;
+  cursor: pointer;
+}
+
+/* Upload Button */
+.uploadButton {
+  background-color: #1d783a;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 15px;
+  transition: background 0.2s ease-in-out;
 }
 
 .uploadButton:hover {
-  background-color: #2563eb;
+  background-color: #145428;
 }
 
+/* Error Message */
 .errorMessage {
   margin-top: 15px;
   color: red;
-}
-
-.dataContainer {
-  width: 100%;
-  margin-top: 20px;
-  overflow-x: auto;
-}
-
-.dataHeader {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.dataTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.dataTable th,
-.dataTable td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
-}
-
-.dataTable th {
-  background-color: #f3f4f6;
-  font-weight: bold;
+  font-size: 14px;
 }

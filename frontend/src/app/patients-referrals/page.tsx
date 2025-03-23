@@ -3,8 +3,9 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Layout from "../layout"; // Import Layout
 import "./page.lodel.css"; // Import styles
+import Modal from "./modal"; // ✅ Import Modal
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:4000";
 const PATIENTS_PER_PAGE = 10; // Number of patients per page
 
 console.log("📡 Using Backend URL:", BACKEND_URL);
@@ -36,17 +37,125 @@ const PatientsReferrals: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [inputPage, setInputPage] = useState<string>("1"); // ✅ New input state
-  const [isEditingPage, setIsEditingPage] = useState(false); // ✅ New editing state
+  const [inputPage, setInputPage] = useState<string>("1");
+  const [isEditingPage, setIsEditingPage] = useState(false);
+  const [showFilterContainer, setShowFilterContainer] = useState(false); // ✅ New state for filter container
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [exactMatch, setExactMatch] = useState(false);
+  const [rawInput, setRawInput] = useState<{ [key in keyof Patient]?: [string, string] }>({});
 
+   // ✅ Open Modal with patient data
+   const handleOpenModal = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsModalOpen(true);
+  };
+
+  // ✅ Close Modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPatient(null);
+  };
+
+  // ✅ State to control the modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+
+  // ✅ Temporary state for user input
+  const [pendingRangeFilters, setPendingRangeFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
+
+  // ✅ Applied state used for actual filtering
+  const [appliedFilters, setAppliedFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
 
   // ✅ State for Sorting and Searching
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Sorting state
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search state
 
-  // ✅ Fetch Patient Data (fixed dependency issue)
+  const [minMaxValues, setMinMaxValues] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
+
+  const calculateMinMaxValues = (patients: Patient[]) => {
+    const values: { [key in keyof Patient]?: [number | null, number | null] } = {};
+  
+    patients.forEach((patient) => {
+      for (const key in patient) {
+        const typedKey = key as keyof Patient;
+        const value = patient[typedKey] as number | null;
+  
+        if (value !== null) {
+          if (!values[typedKey]) {
+            values[typedKey] = [value, value];
+          } else {
+            values[typedKey] = [
+              Math.min(values[typedKey]![0]!, value),
+              Math.max(values[typedKey]![1]!, value),
+            ];
+          }
+        }
+      }
+    });
+  
+    setMinMaxValues(values);
+  };
+  
+  useEffect(() => {
+    if (patients.length > 0) {
+      calculateMinMaxValues(patients);
+    }
+  }, [patients]);  
+
+  const adjustRangeValues = (key: keyof Patient, index: number, value: string) => {
+    setRangeFilters((prev) => {
+      const updated = { ...prev };
+      const numericValue = value ? parseFloat(value) : null;
+  
+      if (!updated[key]) updated[key] = [null, null];
+  
+      // ✅ Adjust according to min/max values
+      if (numericValue !== null) {
+        if (index === 0) {
+          // Min value
+          updated[key]![0] = Math.max(
+            numericValue,
+            minMaxValues[key]?.[0] ?? numericValue
+          );
+        } else if (index === 1) {
+          // Max value
+          updated[key]![1] = Math.min(
+            numericValue,
+            minMaxValues[key]?.[1] ?? numericValue
+          );
+        }
+      } else {
+        updated[key]![index] = null;
+      }
+  
+      return updated;
+    });
+  };  
+
+  // ✅ State for Min/Max Filtering
+  const [rangeFilters, setRangeFilters] = useState<{ [key in keyof Patient]?: [number | null, number | null] }>({});
+
+  const handleAdvancedFiltering = () => {
+    let filteredData = [...patients];
+  
+    // ✅ Loop through the rangeFilters
+    for (const key in rangeFilters) {
+      const [min, max] = rangeFilters[key as keyof Patient] ?? [null, null];
+      
+      if (min !== null || max !== null) {
+        filteredData = filteredData.filter((patient) => {
+          const value = patient[key as keyof Patient] as number | null;
+          if (value === null) return false;
+          return (min === null || value >= min) && (max === null || value <= max);
+        });
+      }
+    }
+  
+    setPatients(filteredData);
+    setCurrentPage(1); // Reset to first page after applying filters
+  };
+  
+  // ✅ Fetch Patient Data
   const fetchPatients = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -63,14 +172,9 @@ const PatientsReferrals: React.FC = () => {
       }
 
       const data = await response.json();
+
       if (Array.isArray(data.patients) && data.patients.length > 0) {
         setPatients(data.patients);
-        setError("");
-
-        if (refreshIntervalRef.current) {
-          clearInterval(refreshIntervalRef.current);
-          refreshIntervalRef.current = null;
-        }
       } else {
         setPatients([]);
       }
@@ -80,22 +184,11 @@ const PatientsReferrals: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // ✅ Removed patients from dependencies
+  }, []);
 
   // ✅ Proper useEffect Dependency
   useEffect(() => {
     fetchPatients();
-
-    refreshIntervalRef.current = setInterval(() => {
-      if (patients.length === 0) {
-        fetchPatients();
-      } else {
-        if (refreshIntervalRef.current) {
-          clearInterval(refreshIntervalRef.current);
-          refreshIntervalRef.current = null;
-        }
-      }
-    }, 5000);
 
     return () => {
       if (refreshIntervalRef.current) {
@@ -113,39 +206,56 @@ const PatientsReferrals: React.FC = () => {
   const getFilteredPatients = () => {
     let filteredData = patients;
   
-    // ✅ Filter Logic
+    // ✅ Referral Filter Logic
     if (filter === "needReferral") {
       filteredData = filteredData.filter((patient) => patient.referral === 1);
     } else if (filter === "noReferral") {
       filteredData = filteredData.filter((patient) => patient.referral === 0);
     }
-  
-    // ✅ Search Logic
-    if (searchQuery) {
+
+    // ✅ Search Filter Logic
+  if (searchQuery) {
+    filteredData = filteredData.filter((patient) => {
+      if (exactMatch) {
+        return patient.encounterId.toString() === searchQuery;
+      } else {
+        return patient.encounterId.toString().startsWith(searchQuery);
+      }
+    });
+  }
+
+  // ✅ Range Filtering Using `appliedFilters`
+  for (const key in appliedFilters) {
+    const [min, max] = appliedFilters[key as keyof Patient] ?? [null, null];
+    if (min !== null || max !== null) {
       filteredData = filteredData.filter((patient) => {
-        if (exactMatch) {
-          // ✅ Exact Match Search
-          return patient.encounterId.toString() === searchQuery;
-        } else {
-          // ✅ Start Match Only (instead of includes)
-          return patient.encounterId.toString().startsWith(searchQuery);
-        }
+        const value = patient[key as keyof Patient] as number | null;
+        if (value === null) return false;
+        return (min === null || value >= min) && (max === null || value <= max);
       });
     }
-  
-    // ✅ Sorting Logic
-    filteredData.sort((a, b) =>
-      sortOrder === "asc" ? a.encounterId - b.encounterId : b.encounterId - a.encounterId
-    );
-  
+  }
+
     return filteredData;
-  };  
+  }; 
 
   const filteredPatients = getFilteredPatients();
   const totalPages = Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE);
-  const indexOfLastPatient = currentPage * PATIENTS_PER_PAGE;
-  const indexOfFirstPatient = indexOfLastPatient - PATIENTS_PER_PAGE;
-  const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient);
+  const currentPatients = filteredPatients.slice(
+    (currentPage - 1) * PATIENTS_PER_PAGE,
+    currentPage * PATIENTS_PER_PAGE
+  );
+
+    // ✅ Handle Range Filter Changes
+  const handleRangeChange = (key: keyof Patient, index: number, value: string) => {
+    setRangeFilters((prev) => {
+      const updated = { ...prev };
+      const numericValue = value ? parseFloat(value) : null;
+      if (!updated[key]) updated[key] = [null, null];
+      updated[key]![index] = numericValue;
+      return updated;
+    });
+  };   
 
     useEffect(() => {
       if (!isEditingPage) {
@@ -188,180 +298,319 @@ const PatientsReferrals: React.FC = () => {
       setInputPage(""); // ✅ Clear input when clicked
     };    
 
-    // ✅ Handle Sorting (Ascending or Descending)
-  const handleSort = () => {
-  setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+// ✅ Update the temporary state only (without triggering actual filtering)
+const handlePendingRangeChange = (key: keyof Patient, index: number, value: string) => {
+  // ✅ Update raw input (display value)
+  setRawInput((prev) => {
+    const updated = { ...prev };
+    if (!updated[key]) updated[key] = ["", ""];
+    updated[key][index] = value;
+    return updated;
+  });
+
+  // ✅ Update pending state (for backend use)
+  setPendingRangeFilters((prev) => {
+    const updated = JSON.parse(JSON.stringify(prev)); // Deep copy to avoid reference issues
+    let numericValue = value ? parseFloat(value) : null;
+
+    if (!updated[key]) updated[key] = [null, null];
+
+    if (numericValue !== null) {
+      if (index === 0) {
+        // Min value — Clamp to allowed minimum
+        numericValue = Math.max(numericValue, minMaxValues[key]?.[0] ?? numericValue);
+      } else if (index === 1) {
+        // Max value — Clamp to allowed maximum
+        numericValue = Math.min(numericValue, minMaxValues[key]?.[1] ?? numericValue);
+      }
+    }
+
+    updated[key][index] = numericValue;
+
+    return updated;
+  });
+};
+
+const handleApplyFilters = () => {
+  setAppliedFilters(pendingRangeFilters); // ✅ Confirm and apply filters
+  setCurrentPage(1); // ✅ Reset to the first page after filtering
+
+  // ✅ Clear the input values WITHOUT resetting applied filters
+  setRawInput({});
+};
+
+const handleRawInputBlur = (key: keyof Patient, index: number) => {
+  setPendingRangeFilters((prev) => {
+    const updated = { ...prev };
+
+    // ✅ Get existing values
+    let minValue = updated[key]?.[0] ?? null;
+    let maxValue = updated[key]?.[1] ?? null;
+
+    if (rawInput[key]?.[0] !== undefined) {
+      minValue = parseFloat(rawInput[key]![0] || "") || null;
+    }
+    if (rawInput[key]?.[1] !== undefined) {
+      maxValue = parseFloat(rawInput[key]![1] || "") || null;
+    }
+
+    // ✅ Adjust based on allowed range
+    if (minValue !== null) {
+      minValue = Math.max(minValue, minMaxValues[key]?.[0] ?? minValue);
+    }
+    if (maxValue !== null) {
+      maxValue = Math.min(maxValue, minMaxValues[key]?.[1] ?? maxValue);
+    }
+
+    // ✅ If min > max → swap them
+    if (minValue !== null && maxValue !== null && minValue > maxValue) {
+      const temp = minValue;
+      minValue = maxValue;
+      maxValue = temp;
+    }
+
+    // ✅ Update state with corrected values
+    updated[key] = [minValue, maxValue];
+
+    // ✅ Sync corrected value to `rawInput`
+    setRawInput((prev) => {
+      const newRawInput = { ...prev };
+      newRawInput[key]![0] = minValue !== null ? minValue.toString() : "";
+      newRawInput[key]![1] = maxValue !== null ? maxValue.toString() : "";
+      return newRawInput;
+    });
+
+    return updated;
+  });
 };
 
   return (
-<Layout>
-  <div className="dashboard">
-    <h1 className="dashboard-title">Patients Referred to Dietitian</h1>
+    <Layout>
+      <div className="dashboard">
+        <h1 className="dashboard-title">Patients Referred to Dietitian</h1>
 
-    {/* Show Loading Message */}
-    {loading && <p className="loading-message">⏳ Loading patient data...</p>}
+        {/* Show Loading Message */}
+        {loading && <p className="loading-message">⏳ Loading patient data...</p>}
 
-    {/* Show Error Message */}
-    {error && !loading && <p className="error-message">⚠️ {error}</p>}
+        {/* Show Error Message */}
+        {error && !loading && <p className="error-message">⚠️ {error}</p>}
 
-    <div className="control-container">
-    {/* Filter Buttons */}
-    <div className="filter-container">
-      <button
-        onClick={() => setFilter("all")}
-        className={`filter-button ${filter === "all" ? "active" : ""}`}
-      >
-        All Patients
-      </button>
-      <button
-        onClick={() => setFilter("needReferral")}
-        className={`filter-button ${filter === "needReferral" ? "active" : ""}`}
-      >
-        Needs Referral
-      </button>
-      <button
-        onClick={() => setFilter("noReferral")}
-        className={`filter-button ${filter === "noReferral" ? "active" : ""}`}
-      >
-        No Referral Needed
-      </button>
-    </div>
-    {/* Sort & Search Buttons (Right) */}
-  <div className="sort-search-container">
-    {/* Search Box */}
-    <input
-      type="text"
-      placeholder="Search by ID"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="search-input"
-    />
-{/* Exact Match Checkbox */}
-<label className="exact-match-label">
-    <input
-      type="checkbox"
-      checked={exactMatch}
-      onChange={() => setExactMatch((prev) => !prev)}
-      className="exact-match-checkbox"
-    />
-    Exact Match
-  </label>
-    {/* Sort Button */}
-    <button onClick={handleSort} className="sort-button">
-      Sort {sortOrder === "asc" ? "↑" : "↓"}
-    </button>
-  </div>
-</div>
+        <div className="control-container">
+          {/* Filter Buttons */}
+          <div className="filter-container">
+            <button
+              onClick={() => setFilter("all")}
+              className={`filter-button ${filter === "all" ? "active" : ""}`}
+            >
+              All Patients
+            </button>
+            <button
+              onClick={() => setFilter("needReferral")}
+              className={`filter-button ${filter === "needReferral" ? "active" : ""}`}
+            >
+              Needs Referral
+            </button>
+            <button
+              onClick={() => setFilter("noReferral")}
+              className={`filter-button ${filter === "noReferral" ? "active" : ""}`}
+            >
+              No Referral Needed
+            </button>
+          </div>
 
-    {/* Display Data in a Table */}
-    {!loading && !error && currentPatients.length > 0 ? (
-      <>
-        {/* Table Container */}
-        <div className="table-wrapper">
-          <div className="table-scroll-container">
-            <table className="patients-table">
-              <thead>
-                <tr>
-                  <th>Encounter ID</th>
-                  <th>End Tidal CO2</th>
-                  <th>Feed Volume</th>
-                  <th>Feed Volume Admin</th>
-                  <th>FIO2</th>
-                  <th>FIO2 Ratio</th>
-                  <th>Inspiratory Time</th>
-                  <th>Oxygen Flow Rate</th>
-                  <th>PEEP</th>
-                  <th>PIP</th>
-                  <th>Respiratory Rate</th>
-                  <th>SIP</th>
-                  <th>Tidal Volume</th>
-                  <th>Tidal Volume Actual</th>
-                  <th>Tidal Vol/Kg</th>
-                  <th>Tidal Vol Spon</th>
-                  <th>BMI</th>
-                  {/* Sticky referral column */}
-                  <th className="sticky-column">Referral</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentPatients.map((patient, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "even-row" : "odd-row"}>
-                    <td>{patient.encounterId}</td>
-                    <td>{patient.end_tidal_co2 ?? "N/A"}</td>
-                    <td>{patient.feed_vol ?? "N/A"}</td>
-                    <td>{patient.feed_vol_adm ?? "N/A"}</td>
-                    <td>{patient.fio2 ?? "N/A"}</td>
-                    <td>{patient.fio2_ratio ?? "N/A"}</td>
-                    <td>{patient.insp_time ?? "N/A"}</td>
-                    <td>{patient.oxygen_flow_rate ?? "N/A"}</td>
-                    <td>{patient.peep ?? "N/A"}</td>
-                    <td>{patient.pip ?? "N/A"}</td>
-                    <td>{patient.resp_rate ?? "N/A"}</td>
-                    <td>{patient.sip ?? "N/A"}</td>
-                    <td>{patient.tidal_vol ?? "N/A"}</td>
-                    <td>{patient.tidal_vol_actual ?? "N/A"}</td>
-                    <td>{patient.tidal_vol_kg ?? "N/A"}</td>
-                    <td>{patient.tidal_vol_spon ?? "N/A"}</td>
-                    <td>{patient.bmi ?? "N/A"}</td>
-                    {/* Sticky referral column */}
-                    <td className="sticky-column">
-                      <span className={patient.referral === 1 ? "need-referral" : "no-referral"}>
-                        {patient.referral === 1 ? "Needs Referral" : "No Referral Needed"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Search + Exact Match + Toggle Filter */}
+          <div className="sort-search-container">
+            <input
+              type="text"
+              placeholder="Search by ID"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+            <label className="exact-match-label">
+              <input
+                type="checkbox"
+                checked={exactMatch}
+                onChange={() => setExactMatch((prev) => !prev)}
+                className="exact-match-checkbox"
+              />
+              Exact Match
+            </label>
+            <button 
+              onClick={() => setShowFilterContainer(!showFilterContainer)}
+              className="filter-toggle-button"
+            >
+              {showFilterContainer ? "Hide Filters" : "Show Filters"}
+            </button>
           </div>
         </div>
 
-        {/* Pagination */}
-        <div className="pagination">
-          <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
-            ⏮ First
-          </button>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            ◀ Prev
-          </button>
-          {isEditingPage ? (
-            <input
-              type="number"
-              value={inputPage}
-              onChange={handlePageChange}
-              onKeyDown={handlePageSubmit}
-              onBlur={handlePageBlur}
-              className="pagination-input"
-              autoFocus
-              min={1}
-              max={totalPages}
-            />
-          ) : (
-            <span onClick={handlePageClick} className="pagination-text">
-              Page {currentPage} of {totalPages}
-            </span>
-          )}
+        {/* Advanced Filters */}
+        {showFilterContainer && (
+  <div className="advanced-filter-container">
+    {[
+      { label: "End Tidal CO2", key: "end_tidal_co2" },
+      { label: "Feed Volume", key: "feed_vol" },
+      { label: "Feed Volume Administered", key: "feed_vol_adm" },
+      { label: "FIO2", key: "fio2" },
+      { label: "FIO2 Ratio", key: "fio2_ratio" },
+      { label: "Inspiratory Time", key: "insp_time" },
+      { label: "Oxygen Flow Rate", key: "oxygen_flow_rate" },
+      { label: "PEEP", key: "peep" },
+      { label: "PIP", key: "pip" },
+      { label: "Respiratory Rate", key: "resp_rate" },
+      { label: "SIP", key: "sip" },
+      { label: "Tidal Volume", key: "tidal_vol" },
+      { label: "Tidal Volume Actual", key: "tidal_vol_actual" },
+      { label: "Tidal Volume Kg", key: "tidal_vol_kg" },
+      { label: "Tidal Volume Spon", key: "tidal_vol_spon" },
+      { label: "BMI", key: "bmi" }
+    ].map(({ label, key }) => (
+      <div key={key} className="filter-field">
+        <label>{label}</label>
+        <input
+  type="number"
+  placeholder={`Min (${minMaxValues[key as keyof Patient]?.[0] ?? '-'})`}
+  value={rawInput[key as keyof Patient]?.[0] ?? ''}
+  onChange={(e) =>
+    handlePendingRangeChange(key as keyof Patient, 0, e.target.value) // ✅ FIXED HERE
+  }
+  onBlur={() => handleRawInputBlur(key as keyof Patient, 0)}
+/>
+<input
+  type="number"
+  placeholder={`Max (${minMaxValues[key as keyof Patient]?.[1] ?? '-'})`}
+  value={rawInput[key as keyof Patient]?.[1] ?? ''}
+  onChange={(e) =>
+    handlePendingRangeChange(key as keyof Patient, 1, e.target.value) // ✅ FIXED HERE
+  }
+  onBlur={() => handleRawInputBlur(key as keyof Patient, 1)}
+/>
 
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next ▶
-          </button>
-          <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
-            ⏭ Last
-          </button>
-        </div>
-      </>
-    ) : (
-      !loading && <p className="no-data-message">🔍 No referred patients available.</p>
+          </div>
+        ))}
+
+    {/* ✅ Apply Filters Button */}
+    <button onClick={handleApplyFilters} className="apply-filter-button">
+          Apply Filters
+        </button>
+      </div>
     )}
-  </div>
-</Layout>
-  ); 
-}; 
+
+        {/* Display Data in a Table */}
+        {!loading && !error && currentPatients.length > 0 ? (
+          <>
+            <div className="table-wrapper">
+              <div className="table-scroll-container">
+                <table className="patients-table">
+                  <thead>
+                    <tr>
+                      <th>Encounter ID</th>
+                      <th>Feed Volume</th>
+                      <th>Oxygen Flow Rate</th>
+                      <th>Respiratory Rate</th>
+                      <th>BMI</th>
+                      <th className="sticky-column more-data-column">
+                        Display More Data
+                      </th>
+                      <th className="sticky-column">Referral</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentPatients.map((patient, index) => (
+                      <tr key={index} className={index % 2 === 0 ? "even-row" : "odd-row"}>
+                        <td>{patient.encounterId}</td>
+                        <td>{patient.feed_vol ?? "N/A"}</td>
+                        <td>{patient.oxygen_flow_rate ?? "N/A"}</td>
+                        <td>{patient.resp_rate ?? "N/A"}</td>
+                        <td>{patient.bmi ?? "N/A"}</td>
+                        <td className="sticky-column more-data-column">
+                  {/* ✅ Open the Modal */}
+                  <a
+                    href="#"
+                    className="more-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOpenModal(patient);
+                    }}
+                  >
+                            More
+                          </a>
+                        </td>
+                        <td className="sticky-column">
+                          <span className={patient.referral === 1 ? "need-referral" : "no-referral"}>
+                            {patient.referral === 1 ? "Needs Referral" : "No Referral Needed"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Pagination */}
+              <div className="pagination">
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  ⏮ First
+                </button>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  ◀ Prev
+                </button>
+                {isEditingPage ? (
+                  <input
+                    type="number"
+                    value={inputPage}
+                    onChange={handlePageChange}
+                    onKeyDown={handlePageSubmit}
+                    onBlur={handlePageBlur}
+                    className="pagination-input"
+                    autoFocus
+                    min={1}
+                    max={totalPages}
+                  />
+                ) : (
+                  <span onClick={handlePageClick} className="pagination-text">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                )}
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  Next ▶
+                </button>
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  ⏭ Last
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          !loading && (
+            <p className="no-data-message">
+              🔍 No referred patients available.
+            </p>
+          )
+        )}
+        {/* ✅ Modal is Now Cleanly Handled in `Modal.tsx` */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          selectedPatient={selectedPatient}
+        />
+      </div>
+    </Layout>
+  );
+};
 
 export default PatientsReferrals;

@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <header className="header">
             <nav className="navbar">
               <div className="nav-buttons">
-                <Link href="/home"><button>Home</button></Link>
+                <Link href="/"><button>Home</button></Link>
                 <Link href="/patients-referrals"><button>Patients Referrals</button></Link>
                 <Link href="/analyse-patients-data"><button>Analyse Patients Data</button></Link>
                 <Link href="/upload"><button>Upload CSV</button></Link>

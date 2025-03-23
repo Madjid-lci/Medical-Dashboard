@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"; // For redirection
 import styles from "./UploadPage.module.css";
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000"; // Detect backend URL dynamically
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:4000"; // Detect backend URL dynamically
 
 const UploadPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -60,27 +60,34 @@ const UploadPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.header}>Upload CSV File</h1>
-      <label htmlFor="fileUpload" className={styles.fileLabel}>
-        Upload CSV File:
-      </label>
-      <input
-        type="file"
-        id="fileUpload"
-        accept=".csv"
-        onChange={handleFileChange}
-        className={styles.fileInput}
-        title="Select a CSV file to upload"
+    <h1 className={styles.header}>Upload CSV File.</h1>
+    <p className={styles.instructions}>
+      Please upload a CSV file containing patient data. The CSV should include the following columns:  
+      <strong> PatientID, Name, Age, Measurements, and Referral.</strong>
+    </p>
+
+    <label className={styles.fileLabel}>Select CSV File:</label>
+
+    <div className={styles.fileInputContainer}>
+      <input 
+        type="file" 
+        accept=".csv" 
+        onChange={handleFileChange} 
+        className={styles.fileInput} 
       />
-
-      <button onClick={handleUpload} className={styles.uploadButton}>
-        Upload CSV
-      </button>
-
-      {error && <p className={styles.errorMessage}>{error}</p>}
-      {message && <p className={styles.successMessage}>{message}</p>}
+      <span className={styles.fileIcon}>📄</span>
     </div>
-  );
+
+    <button onClick={handleUpload} className={styles.uploadButton}>
+      Upload CSV
+    </button>
+
+    {error && <p className={styles.errorMessage}>{error}</p>}
+  </div>
+);
 };
+
+  
+
 
 export default UploadPage;

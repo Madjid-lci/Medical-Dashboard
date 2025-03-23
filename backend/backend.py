@@ -74,5 +74,5 @@ def get_patients():
     return jsonify({"patients": patients_data})
 
 if __name__ == "__main__":
-    print("🚀 Backend Server is Running on http://0.0.0.0:5000...")
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    print("🚀 Backend Server is Running on http://0.0.0.0:4000...")
+    app.run(debug=True, host="0.0.0.0", port=4000)
