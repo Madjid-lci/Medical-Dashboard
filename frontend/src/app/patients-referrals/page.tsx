@@ -491,10 +491,12 @@ const handleRawInputBlur = (key: keyof Patient, index: number) => {
         ))}
 
     {/* ✅ Apply Filters Button */}
+    <div className="filter-button-container">
     <button onClick={handleApplyFilters} className="apply-filter-button">
           Apply Filters
         </button>
       </div>
+        </div>
     )}
 
         {/* Display Data in a Table */}

@@ -458,12 +458,17 @@
 /* ========================
    APPLY FILTER BUTTON
 ======================== */
+/* Wrap container */
+.filter-button-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  grid-column: 1 / -1; /* Span entire row in the grid */
+  margin-top: 20px;
+}
+
+/* Clean up the button itself */
 .apply-filter-button {
-  position: relative; /* ✅ Make it relative to stay in the same layer */
-  margin-top: 20px; /* ✅ Create space between the button and content */
-  margin-bottom: 10px; /* ✅ Ensure it aligns well within the container */
-  margin-left: 1215px; /* ✅ Align the button to the right */
-  margin-right: -1215px; /* ✅ Align the button to the right */
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
