@@ -1,25 +1,27 @@
+"use client"; // Mark the file as a Client Component
+
 import React, { ReactNode } from "react";
 import Link from "next/link";
-import "./globals.css"; // Import global styles
+import "./globals.css"; // Ensure correct path to global styles
 
 type LayoutProps = {
-  children: ReactNode; // Type for children (React components or elements)
+  children: ReactNode;
 };
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <html>
+    <html lang="en">
       <body>
         <div className="layout">
           {/* Header */}
           <header className="header">
             <nav className="navbar">
               <div className="nav-buttons">
-                <Link href="/dashboard"><button>Home</button></Link>
+                <Link href="/"><button>Home</button></Link>
                 <Link href="/patients-referrals"><button>Patients Referrals</button></Link>
-                <Link href="/analyse-data"><button>Analyse Patients Data</button></Link>
+                <Link href="/analyse-patients-data"><button>Analyse Patients Data</button></Link>
                 <Link href="/upload"><button>Upload CSV</button></Link>
-                <Link href="/report"><button>Report</button></Link>
+                <Link href="/reports"><button>Reports</button></Link>
                 <Link href="/help"><button>Help</button></Link>
               </div>
             </nav>

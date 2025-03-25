@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import styles from "./page.module.css"; // Ensure this file exists for styling
+import Link from "next/link";
+import styles from "./page.module.css";
 
 const HomePage: React.FC = () => {
   const [formattedDate, setFormattedDate] = useState("");
@@ -18,9 +19,9 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className={styles.homeContainer}>
+    <div className={styles.fullPageWrapper}>
       <div className={styles.mainContent}>
-        <h1>Welcome to the CCU APP</h1>
+        <h1 className={styles.title}>Welcome to the CCU APP</h1>
         <p className={styles.date}>{formattedDate}</p>
 
         {/* Logo Placeholder */}
@@ -28,8 +29,12 @@ const HomePage: React.FC = () => {
 
         {/* Buttons */}
         <div className={styles.buttonGroup}>
-          <button className={styles.mainButton}>Upload CSV</button>
-          <button className={styles.mainButton}>Help</button>
+          <Link href="/upload">
+            <button className={styles.mainButton}>Upload CSV</button>
+          </Link>
+          <Link href="/help">
+            <button className={styles.mainButton}>Help</button>
+          </Link>
         </div>
       </div>
     </div>

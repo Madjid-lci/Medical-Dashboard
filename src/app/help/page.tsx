@@ -1,33 +1,81 @@
 import React from "react";
-import Layout from "../layout";
-import "./help.css";
+import styles from "./help.model.css"; // Import the CSS module
 
 const HelpPage: React.FC = () => {
   return (
-    <Layout>
-      <div className="dashboard">
-        <h1 className="dashboard-title">Help</h1>
+    <div className={styles.helpContainer}>
+      <header className={styles.helpHeader}>
+        <h1>Help & Support</h1>
+        <p>Find answers to common questions and learn how to use the Medical Dashboard efficiently.</p>
+      </header>
 
-        <section className="help-section">
-          <h2>How to Navigate the CCU App</h2>
-          <ul>
-            <li><strong>Home:</strong> Your starting point with key actions and welcome screen.</li>
-            <li><strong>Patients Referrals:</strong> View patients referred to a dietitian and manage them.</li>
-            <li><strong>Analyse Patients Data:</strong> Run analytics on uploaded patient information.</li>
-            <li><strong>Upload CSV:</strong> Upload a spreadsheet (.csv) to add multiple patient entries.</li>
-            <li><strong>Report:</strong> Generate summary reports of patient referral data.</li>
-            <li><strong>Help:</strong> You're here! This page gives an overview of how to use each section.</li>
-          </ul>
+      {/* Getting Started Section */}
+      <section className={styles.guideSection}>
+        <h2>🩺 Getting Started</h2>
+        <p>
+          The <strong>CCU Medical Dashboard</strong> helps healthcare professionals manage patient data and refer 
+          individuals to a dietitian based on their medical status.
+        </p>
+        <ul>
+          <li>✔️ <strong>Upload patient data</strong> via the CSV upload page.</li>
+          <li>✔️ <strong>Analyze patient vitals</strong> and prioritize those in need of nutritional support.</li>
+          <li>✔️ <strong>Generate reports</strong> for dietitian referrals and patient monitoring.</li>
+        </ul>
+      </section>
 
-          <h2>Need Further Assistance?</h2>
+      {/* FAQ Section */}
+      <section className={styles.faqSection}>
+        <h2>❓ Frequently Asked Questions</h2>
+
+        <div className={styles.faqItem}>
+          <h3>📌 How do I upload patient data?</h3>
           <p>
-            If something isn’t working or you need more help, please reach out to our support team:<br />
-            📧 <strong>support@ccuapp.example</strong><br />
-            Or contact your site administrator.
+            Navigate to the <strong>Upload CSV</strong> page, select your file, and click **Upload**. Ensure your CSV follows 
+            the required format for accurate processing.
           </p>
-        </section>
-      </div>
-    </Layout>
+        </div>
+
+        <div className={styles.faqItem}>
+          <h3>📊 How does the system prioritize patients for dietitian referral?</h3>
+          <p>
+            The dashboard uses a machine learning model to assess **BMI, glucose levels, dietary intake, and other vitals** 
+            to flag high-risk patients needing dietitian intervention.
+          </p>
+        </div>
+
+        <div className={styles.faqItem}>
+          <h3>📄 How can I generate a dietitian referral report?</h3>
+          <p>
+            Go to the <strong>Reports</strong> section, select the relevant date range, and download a **detailed report** 
+            containing referred patients.
+          </p>
+        </div>
+
+        <div className={styles.faqItem}>
+          <h3>🔄 Can I update patient records after uploading?</h3>
+          <p>
+            Yes, you can go to the **Patients Referrals** section and edit existing records to reflect updated medical 
+            information.
+          </p>
+        </div>
+
+        <div className={styles.faqItem}>
+          <h3>📞 How can I contact support?</h3>
+          <p>
+            If you encounter issues, please email us at **support@medicaldashboard.com** or call **+44 1234 567890**.
+          </p>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className={styles.contactSection}>
+        <h2>📬 Need More Help?</h2>
+        <p>
+          If you require further assistance, reach out to our support team. We’re here to help you improve patient care 
+          and streamline dietitian referrals.
+        </p>
+      </section>
+    </div>
   );
 };
 

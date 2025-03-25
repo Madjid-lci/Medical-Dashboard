@@ -2,10 +2,10 @@
 
 import React, { useState, ChangeEvent } from "react";
 import { useRouter } from "next/navigation"; // For redirection
-import styles from "./UploadPage.module.css";
+import styles from "./apd.module.css";
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:4000"; // Detect backend URL dynamically
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000"; // Detect backend URL dynamically
 
 const UploadPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -17,13 +17,13 @@ const UploadPage: React.FC = () => {
     if (e.target.files) {
       setFile(e.target.files[0]);
       setError(""); // Clear errors when a file is selected
-      console.log("📂 File Selected:", e.target.files[0].name);
+      console.log(" File Selected📂:", e.target.files[0].name);
     }
   };
 
   const handleUpload = async () => {
     if (!file) {
-      setError("⚠️ Please select a CSV file.");
+      setError("⚠️ Please select a CSV file.⚠️");
       return;
     }
 
@@ -44,7 +44,7 @@ const UploadPage: React.FC = () => {
         throw new Error(result.error || "Unknown error occurred.");
       }
 
-      setMessage("✅ CSV uploaded successfully! Redirecting...");
+      setMessage(" CSV uploaded successfully✅! Redirecting...");
       setError("");
 
       // Redirect to the referrals page after successful upload
@@ -52,7 +52,7 @@ const UploadPage: React.FC = () => {
         router.push("/patients-referrals");
       }, 2000);
     } catch (err: any) {
-      console.error("❌ Upload failed:", err);
+      console.error("Upload failed ❌:", err);
       setError("⚠️ Failed to upload file. Check your network connection.");
       setMessage("");
     }
@@ -60,34 +60,28 @@ const UploadPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-    <h1 className={styles.header}>Upload CSV File.</h1>
-    <p className={styles.instructions}>
-      Please upload a CSV file containing patient data. The CSV should include the following columns:  
-      <strong> PatientID, Name, Age, Measurements, and Referral.</strong>
-    </p>
-
-    <label className={styles.fileLabel}>Select CSV File:</label>
-
-    <div className={styles.fileInputContainer}>
-      <input 
-        type="file" 
-        accept=".csv" 
-        onChange={handleFileChange} 
-        className={styles.fileInput} 
+      <h1 className={styles.header}>Analyse Patients Data </h1>
+      <h2>With a Machine Learning Model </h2>
+      <label htmlFor="fileUpload" className={styles.fileLabel}>
+        Upload CSV File:
+      </label>
+      <input
+        type="file"
+        id="fileUpload"
+        accept=".csv"
+        onChange={handleFileChange}
+        className={styles.fileInput}
+        title="Select a CSV file to upload"
       />
-      <span className={styles.fileIcon}>📄</span>
+
+      <button onClick={handleUpload} className={styles.uploadButton}>
+        Upload CSV
+      </button>
+
+      {error && <p className={styles.errorMessage}>{error}</p>}
+      {message && <p className={styles.successMessage}>{message}</p>}
     </div>
-
-    <button onClick={handleUpload} className={styles.uploadButton}>
-      Upload CSV
-    </button>
-
-    {error && <p className={styles.errorMessage}>{error}</p>}
-  </div>
-);
+  );
 };
-
-  
-
 
 export default UploadPage;
