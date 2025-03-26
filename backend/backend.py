@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from flask import Flask, request, jsonify
 import pandas as pd
 import os
@@ -6,7 +5,7 @@ import numpy as np  # ✅ Import NumPy to handle NaN values
 from flask_cors import CORS  
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins
+CORS(app, resources={r"/": {"origins": ""}})  # Allow all origins
 
 # ✅ Set MAX CONTENT LENGTH to 50MB
 MAX_FILE_SIZE_MB = 50  
@@ -17,7 +16,7 @@ print(f"🚀 Flask Server Starting... MAX FILE SIZE: {app.config['MAX_CONTENT_LE
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# ✅ Initialize `patients_data` as an empty list at the beginning
+# ✅ Initialize patients_data as an empty list at the beginning
 patients_data = []  
 
 @app.errorhandler(413)
@@ -33,12 +32,12 @@ def upload_csv():
     global patients_data  # ✅ Use global variable
 
     if "file" not in request.files:
-        print("⚠️ No file uploaded!")
+        print("⚠ No file uploaded!")
         return jsonify({"error": "No file uploaded"}), 400
 
     file = request.files["file"]
     if file.filename == "":
-        print("⚠️ No selected file!")
+        print("⚠ No selected file!")
         return jsonify({"error": "No selected file"}), 400
 
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
@@ -48,7 +47,7 @@ def upload_csv():
         df = pd.read_csv(file_path)
         print(f"✅ CSV File '{file.filename}' Loaded Successfully! Rows: {len(df)}")
 
-        # ✅ Convert NaN values to `None` to avoid JSON issues
+        # ✅ Convert NaN values to None to avoid JSON issues
         df = df.replace({np.nan: None})
 
         # ✅ Store patient data globally
@@ -68,7 +67,7 @@ def get_patients():
     global patients_data  # ✅ Make sure this is defined
 
     if not patients_data:
-        print("⚠️ No patient data available!")
+        print("⚠ No patient data available!")
         return jsonify({"error": "No data available"}), 404  
 
     print(f"✅ Returning {len(patients_data)} patients data")
@@ -77,15 +76,3 @@ def get_patients():
 if __name__ == "__main__":
     print("🚀 Backend Server is Running on http://0.0.0.0:4000...")
     app.run(debug=True, host="0.0.0.0", port=4000)
-=======
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Flask Backend is Running!"
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5005)
->>>>>>> 7f723e411d014c6d60a8a9c84788385934b6e8b8
