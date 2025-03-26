@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, request, jsonify
 import pandas as pd
 import os
@@ -76,3 +77,15 @@ def get_patients():
 if __name__ == "__main__":
     print("🚀 Backend Server is Running on http://0.0.0.0:4000...")
     app.run(debug=True, host="0.0.0.0", port=4000)
+=======
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Flask Backend is Running!"
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5005)
+>>>>>>> 7f723e411d014c6d60a8a9c84788385934b6e8b8
