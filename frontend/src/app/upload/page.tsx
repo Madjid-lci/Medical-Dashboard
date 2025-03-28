@@ -23,7 +23,7 @@ const UploadPage: React.FC = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      setError("⚠️ Please select a CSV file.");
+      setError("⚠ Please select a CSV file.");
       return;
     }
 
@@ -32,7 +32,7 @@ const UploadPage: React.FC = () => {
 
     try {
       console.log("📡 Sending request to:", `${BACKEND_URL}/upload-csv`);
-      const response = await fetch(`${BACKEND_URL}/upload-csv`, {
+      const response = await fetch("http://192.168.216.130:4000/upload-csv", {
         method: "POST",
         body: formData,
       });
@@ -53,41 +53,39 @@ const UploadPage: React.FC = () => {
       }, 2000);
     } catch (err: any) {
       console.error("❌ Upload failed:", err);
-      setError("⚠️ Failed to upload file. Check your network connection.");
+      setError("⚠ Failed to upload file. Check your network connection.");
       setMessage("");
     }
   };
 
   return (
     <div className={styles.container}>
-    <h1 className={styles.header}>Upload CSV File.</h1>
-    <p className={styles.instructions}>
-      Please upload a CSV file containing patient data. The CSV should include the following columns:  
-      <strong> PatientID, Name, Age, Measurements, and Referral.</strong>
-    </p>
+      <h1 className={styles.header}>Upload CSV File.</h1>
+      <p className={styles.instructions}>
+        Please upload a CSV file containing patient data. The CSV should include the following columns:  
+        <strong> PatientID, Name, Age, Measurements, and Referral.</strong>
+      </p>
 
-    <label className={styles.fileLabel}>Select CSV File:</label>
+      <label className={styles.fileLabel}>Select CSV File:</label>
 
-    <div className={styles.fileInputContainer}>
-      <input 
-        type="file" 
-        accept=".csv" 
-        onChange={handleFileChange} 
-        className={styles.fileInput} 
-      />
-      <span className={styles.fileIcon}>📄</span>
+      <div className={styles.fileInputContainer}>
+        <input 
+          type="file" 
+          accept=".csv" 
+          onChange={handleFileChange} 
+          className={styles.fileInput} 
+        />
+        <span className={styles.fileIcon}>📄</span>
+      </div>
+
+      <button onClick={handleUpload} className={styles.uploadButton}>
+        Upload CSV
+      </button>
+
+      {error && <p className={styles.errorMessage}>{error}</p>}
+      {message && <p className={styles.successMessage}>{message}</p>}
     </div>
-
-    <button onClick={handleUpload} className={styles.uploadButton}>
-      Upload CSV
-    </button>
-
-    {error && <p className={styles.errorMessage}>{error}</p>}
-  </div>
-);
+  );
 };
-
-  
-
 
 export default UploadPage;
