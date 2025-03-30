@@ -89,6 +89,7 @@
   color: #333;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .filter-button:hover {
@@ -106,6 +107,20 @@
   background-color: #ccc;
   color: #777;
   cursor: not-allowed;
+}
+
+/* ========================
+   BLUE BUTTON STYLE
+======================== */
+.blue-button {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+}
+
+.blue-button:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 
 /* Responsive Filter Buttons */
@@ -411,7 +426,7 @@
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
   margin-top: 15px;
-  margin-bottom: 40px; /* ✅ Added space between container and table */
+  margin-bottom: 40px;
   padding: 10px;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
@@ -460,11 +475,15 @@
 ======================== */
 /* Wrap container */
 .filter-button-container {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  grid-column: 1 / -1; /* Span entire row in the grid */
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 20px !important;
+  width: 100%;
   margin-top: 20px;
+  /* Force full width within grid */
+  grid-column: 1 / -1; /* This makes it span all grid columns */
+  background: inherit; /* Match parent background */
+  padding: 10px 0; /* Add vertical spacing */
 }
 
 /* Clean up the button itself */
@@ -472,15 +491,31 @@
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
-  font-size: 14px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  order: 0 !important;
+  position: static !important;
 }
 
 .apply-filter-button:hover {
   background-color: #0056b3;
+}
+
+/* Reset Filter Button */
+.reset-filter-button {
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  /* Remove absolute positioning */
+  order: 0 !important;
+  position: static !important;
+}
+.reset-filter-button:hover {
+  background-color: #c82333;
 }
 
 /* ========================
@@ -497,9 +532,13 @@
     font-size: 12px;
   }
 
-  .apply-filter-button {
+  .apply-filter-button .reset-filter-button {
     width: 100%; /* ✅ Make the button responsive for smaller screens */
     margin-top: 12px;
-    position: static; /* ✅ Ensure it's aligned properly on smaller screens */
+  }
+
+  .filter-button-container {
+    flex-direction: column;
+    gap: 10px !important;
   }
 }

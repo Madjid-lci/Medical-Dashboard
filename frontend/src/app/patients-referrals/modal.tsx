@@ -38,12 +38,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, selectedPatient }) => {
           ✖
         </button>
 
-        {/* ✅ ID Section with Unique Styling */}
+        {/*ID Section with Unique Styling */}
         <div className="modal-header">
           <h2 className="patient-id">Patient ID: {selectedPatient.encounterId}</h2>
         </div>
 
-        {/* ✅ Patient Details */}
+        {/*Patient Details */}
         <div className="modal-body">
           <div className="patient-detail">
             <span className="label">End Tidal CO2:</span>
@@ -110,7 +110,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, selectedPatient }) => {
             <span>{selectedPatient.bmi ?? "N/A"}</span>
           </div>
 
-          {/* ✅ Referral Section with Color Coding (Specific for Modal) */}
+          {/*Referral Section with Color Coding (Specific for Modal) */}
           <div className="patient-detail">
             <span className="label">Referral:</span>
             <span

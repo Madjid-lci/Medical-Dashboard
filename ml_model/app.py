@@ -3,23 +3,22 @@ import pandas as pd
 import joblib
 import os
 from flask_cors import CORS
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
 
 # Load trained model and preprocessing tools
-MODEL_PATH = "referral_model_xgb.pkl"
-SCALER_PATH = "scaler_xgb.pkl"
-IMPUTER_PATH = "knn_imputer.pkl"
-FEATURES_PATH = "selected_features.pkl"
+MODEL_PATH = "referral_model_rf.pkl"
+SCALER_PATH = "scaler_rf.pkl"
+FEATURES_PATH = "feature_names_rf.pkl"
 
-if not all(os.path.exists(p) for p in [MODEL_PATH, SCALER_PATH, IMPUTER_PATH, FEATURES_PATH]):
+if not all(os.path.exists(p) for p in [MODEL_PATH, SCALER_PATH, FEATURES_PATH]):
     raise FileNotFoundError("Model or preprocessing files are missing. Train and save them first.")
 
 model = joblib.load(MODEL_PATH)
 scaler = joblib.load(SCALER_PATH)
-imputer = joblib.load(IMPUTER_PATH)
-selected_features = joblib.load(FEATURES_PATH)
+feature_names = joblib.load(FEATURES_PATH)
 
 @app.route("/upload-csv", methods=["POST"])
 def upload_csv():
@@ -29,31 +28,53 @@ def upload_csv():
     file = request.files["file"]
 
     try:
+        # Read the CSV file
         df = pd.read_csv(file)
 
-        if "encounterId" in df.columns:
-            encounter_ids = df["encounterId"]
-        else:
-            encounter_ids = None
+        # Check for encounterId (if needed later)
+        encounter_ids = df["encounterId"].tolist() if "encounterId" in df.columns else None
 
-        df = df.drop(columns=["referral"], errors="ignore")
-
-        missing_features = [col for col in selected_features if col not in df.columns]
+        # Ensure all required features exist
+        missing_features = [col for col in feature_names if col not in df.columns]
         if missing_features:
             return jsonify({"error": f"Missing features in CSV: {missing_features}"}), 400
 
-        df = df[selected_features]
+        # Replace 0s with NaN for selected columns
+        zero_replace_cols = ['feed_vol', 'oxygen_flow_rate', 'resp_rate', 'bmi']
+        for col in zero_replace_cols:
+            if col in df.columns:
+                df[col] = df[col].replace(0, np.nan)
 
-        df_imputed = imputer.transform(df)
-        df_scaled = scaler.transform(df_imputed)
+        # Fill missing values with the median
+        df.fillna(df.median(numeric_only=True), inplace=True)
+
+        # Prepare the features for prediction
+        df_features = df[feature_names]
+        df_scaled = scaler.transform(df_features)
+
+        # Generate predictions
         predictions = model.predict(df_scaled)
 
-        final_df = pd.DataFrame(df, columns=selected_features)
-        if encounter_ids is not None:
-            final_df.insert(0, "encounterId", encounter_ids)
-        final_df.insert(1, "referral_prediction", predictions)
+        # Replace or add the "referral" column with the predicted values
+        if "referral" in df.columns:
+            df.drop(columns=["referral"], inplace=True)
+        df["referral"] = predictions
 
-        return jsonify({"message": "✅ Predictions generated!", "predictions": predictions.tolist()})
+        # Count predicted referrals
+        referred = int((predictions == 1).sum())
+        not_referred = int((predictions == 0).sum())
+
+        # Return the entire dataset (all rows) with updated predictions
+        sample_data = df.to_dict(orient="records")
+
+        return jsonify({
+            "message": "✅ Predictions generated!",
+            "referral_summary": {
+                "referred": referred,
+                "not_referred": not_referred
+            },
+            "sample_data": sample_data
+        })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -2,164 +2,164 @@
    MODAL BACKDROP
 ======================== */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* ✅ Semi-transparent dark background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-  }
-  
-  /* ========================
-     MODAL CONTENT
-  ======================== */
-  .modal-content {
-    background-color: #fff;
-    padding: 20px;
-    width: 70%;
-    max-width: 900px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    overflow-y: auto; /* ✅ Enable vertical scrolling if needed */
-    max-height: 80vh; /* ✅ Keep it within viewport */
-    position: relative;
-    max-height: 80vh;
-    overflow-y: auto; /* ✅ Makes content scrollable */
-  }
-  
-  /* ========================
-     CLOSE BUTTON
-  ======================== */
-  .modal-close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #888;
-    transition: color 0.2s ease;
-  }
-  
-  .modal-close:hover {
-    color: #000;
-  }  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* âœ… Semi-transparent dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
 
 /* ========================
-   HEADER & ID STYLING
+   MODAL CONTENT
+======================== */
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  width: 70%;
+  max-width: 900px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  overflow-y: auto; /* âœ… Enable vertical scrolling if needed */
+  max-height: 80vh; /* âœ… Keep it within viewport */
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto; /* âœ… Makes content scrollable */
+}
+
+/* ========================
+   CLOSE BUTTON
+======================== */
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #000;
+}  
+
+/* ========================
+ HEADER & ID STYLING
 ======================== */
 .modal-header {
-    margin-bottom: 12px;
-  }
-  
-  .patient-id {
-    font-size: 22px;
-    font-weight: bold;
-    color: #007bff;
-  }
+  margin-bottom: 12px;
+}
+
+.patient-id {
+  font-size: 22px;
+  font-weight: bold;
+  color: #007bff;
+}
 
 /* ========================
-   PATIENT DETAILS
+ PATIENT DETAILS
 ======================== */
 .modal-body {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 8px;
 }
 
 .patient-detail {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-  font-size: 14px;
+display: flex;
+justify-content: space-between;
+padding: 6px;
+background-color: #f9f9f9;
+border-radius: 4px;
+font-size: 14px;
 }
 
 .label {
+font-weight: bold;
+color: #555;
+}
+
+/* ========================
+   INDIVIDUAL DETAIL
+======================== */
+.patient-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+/* âœ… Label formatting */
+.detail-label {
   font-weight: bold;
+  color: #333;
+  text-transform: capitalize;
+}
+
+/* âœ… Value formatting */
+.detail-value {
   color: #555;
 }
-  
-  /* ========================
-     INDIVIDUAL DETAIL
-  ======================== */
-  .patient-detail {
-    display: flex;
-    justify-content: space-between;
-    gap: 6px;
-  }
-  
-  /* ✅ Label formatting */
-  .detail-label {
-    font-weight: bold;
-    color: #333;
-    text-transform: capitalize;
-  }
-  
-  /* ✅ Value formatting */
-  .detail-value {
-    color: #555;
-  }
-  
-  /* ✅ Handle overflow for very long values */
-  .detail-value,
-  .detail-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  /* ✅ Make the modal scrollable if content is too long */
-  .modal-content {
-    overflow-y: auto;
-    max-height: 80vh;
-  }  
+
+/* âœ… Handle overflow for very long values */
+.detail-value,
+.detail-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* âœ… Make the modal scrollable if content is too long */
+.modal-content {
+  overflow-y: auto;
+  max-height: 80vh;
+}  
 
 /* ==========================
-   MODAL REFERRAL COLORS
+ MODAL REFERRAL COLORS
 ========================== */
 .modal-need-referral {
-    background-color: #ffcccc; /* Light red background */
-    color: #d8000c;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    display: inline-block;
-  }
-  
-  .modal-no-referral {
-    background-color: #d4edda; /* Light green background */
-    color: #155724;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    display: inline-block;
-  }
-  
+  background-color: #ffcccc; /* Light red background */
+  color: #d8000c;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.modal-no-referral {
+  background-color: #d4edda; /* Light green background */
+  color: #155724;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  display: inline-block;
+}
+
 /* ========================
-   REFERRAL LABELS
+ REFERRAL LABELS
 ======================== */
 .need-referral,
 .no-referral {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 10px;
-  font-weight: bold;
+display: inline-block;
+padding: 5px 10px;
+border-radius: 5px;
+font-size: 10px;
+font-weight: bold;
 }
 
 .need-referral {
-  background-color: #e81f1f;
-  color: white;
+background-color: #e81f1f;
+color: white;
 }
 
 .no-referral {
-  background-color: #36bd56;
-  color: white;
+background-color: #36bd56;
+color: white;
 }

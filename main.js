@@ -11,7 +11,7 @@ function createWindow() {
   });
 
   // Open the Upload page
-  win.loadURL('http://localhost:3000/upload');
+  win.loadURL('http://localhost:3000');
 }
 
 app.whenReady().then(() => {
