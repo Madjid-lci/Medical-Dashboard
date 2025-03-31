@@ -1,0 +1,7 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/upload/page": "app/upload/page.js",
+  "/patients-referrals/page": "app/patients-referrals/page.js",
+  "/help/page": "app/help/page.js",
+  "/reports/page": "app/reports/page.js"
+}
