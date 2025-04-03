@@ -1,5 +1,6 @@
 "use client";
 
+import html2canvas from "html2canvas";
 import React, { useRef, useMemo, useState } from "react";
 import { Pie, Bar } from "react-chartjs-2";
 import {
@@ -42,16 +43,17 @@ interface PatientsChartsProps {
 }
 
 const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
+  // Attach the ref to the entire page so we capture everything
   const chartRef = useRef<HTMLDivElement>(null);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
 
-  // Display message if no patient data available
+  // If no data, return a message
   if (!patientsData || patientsData.length === 0) {
     return <p className={styles.message}>No data available for charts.</p>;
   }
 
   // -----------------------------
-  // 1) Referral Pie Chart Data & Options
+  // 1) Referral Pie Chart
   // -----------------------------
   const referralCounts = useMemo(() => {
     return patientsData.reduce(
@@ -64,7 +66,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
     );
   }, [patientsData]);
 
-  const referralPieData = {
+  const referralPieData: any = {
     labels: ["Need Referral", "No Referral"],
     datasets: [
       {
@@ -74,7 +76,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
     ],
   };
 
-  const referralPieOptions = {
+  const referralPieOptions: any = {
     plugins: {
       datalabels: { display: false },
       tooltip: {
@@ -94,16 +96,17 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
   };
 
   // -----------------------------
-  // 2) AI Referral Pie Chart Data & Options (Hard-coded example)
+  // 2) AI Referral Pie Chart
   // -----------------------------
   const aiReferralCounts = useMemo(() => {
+    // Hard-coded example
     return {
       withAI: 2485,
       withoutAI: 1484,
     };
   }, []);
 
-  const aiReferralPieData = {
+  const aiReferralPieData: any = {
     labels: ["With AI", "Without AI"],
     datasets: [
       {
@@ -113,7 +116,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
     ],
   };
 
-  const aiReferralPieOptions = {
+  const aiReferralPieOptions: any = {
     plugins: {
       datalabels: { display: false },
       tooltip: {
@@ -133,7 +136,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
   };
 
   // -----------------------------
-  // 3) Missing Data Bar Chart Data & Options
+  // 3) Missing Data Bar Chart
   // -----------------------------
   const fieldsToCheck = [
     "end_tidal_co2",
@@ -163,7 +166,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
     );
   }, [patientsData]);
 
-  const missingDataBarData = {
+  const missingDataBarData: any = {
     labels: fieldsToCheck.map((field) =>
       field.replace(/_/g, " ").toUpperCase()
     ),
@@ -197,7 +200,22 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
     },
     plugins: {
       legend: { position: "top" },
-      datalabels: { display: false },
+datalabels: {
+  display: (ctx) => ctx.dataset.type === "bar",
+  anchor: "end",
+  align: "end",
+  formatter: (value, context) => {
+    if (!value) return "";
+    const label = context.chart.data.labels?.[context.dataIndex] ?? "";
+    const featureKey = (typeof label === "string" ? label.toLowerCase().replace(/ /g, "_") : "");
+    const unit = featureUnits[featureKey] || "";
+    return `${value.toFixed(2)} ${unit}`;
+  },
+  color: "#000",
+  font: { weight: "bold" },
+}
+
+      
     },
   };
 
@@ -210,7 +228,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
   ).length;
 
   // -----------------------------
-  // 4) Key Patient Features Chart Data & Options
+  // 4) Key Patient Features Chart
   // -----------------------------
   const mlFeatures = [
     "feed_vol",
@@ -250,13 +268,35 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
     "#F0B27A",
   ];
 
+  // Feature → Unit mapping
+const featureUnits: Record<string, string> = {
+  feed_vol: "mL",
+  oxygen_flow_rate: "L/min",
+  resp_rate: "breaths/min",
+  bmi: "kg/m²",
+  end_tidal_co2: "mmHg",
+  feed_vol_adm: "mL",
+  fio2: "%",
+  fio2_ratio: "ratio",
+  insp_time: "seconds",
+  peep: "cmH₂O",
+  pip: "cmH₂O",
+  sip: "cmH₂O",
+  tidal_vol: "mL",
+  tidal_vol_actual: "mL",
+  tidal_vol_kg: "mL/kg",
+  tidal_vol_spon: "mL",
+};
+
+
+
   // Map each feature to a specific color
   const featureColorMap: Record<string, string> = mlFeatures.reduce(
     (acc: Record<string, string>, feature, i) => {
       acc[feature] = featureColors[i % featureColors.length];
       return acc;
     },
-    {}
+    {} as Record<string, string>
   );
 
   // Compute average of each selected feature
@@ -282,14 +322,24 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
     borderRadius: 5,
   }));
 
-  const mlFeatureChartData = {
+  // Chart data
+  const mlFeatureChartData: any = {
     labels: selectedFeatures.map((f) => f.replace(/_/g, " ").toUpperCase()),
     datasets: barDatasets,
   };
 
+  // Chart options
   const mlFeatureChartOptions: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        left: 20,
+        right: 60, // <-- this fixes the cutoff issue
+        top: 10,
+        bottom: 10,
+      },
+    },
     scales: {
       y: {
         beginAtZero: true,
@@ -301,15 +351,35 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
         display: (ctx) => ctx.dataset.type === "bar",
         anchor: "end",
         align: "end",
-        formatter: (value) => (value ? value.toFixed(2) : ""),
+        formatter: (value: number, context: any) => {
+          const { dataset, dataIndex } = context;
+          const label = dataset.label || "";
+          const featureKey = label.toLowerCase().replace(/ /g, "_");
+          const unit = featureUnits[featureKey] || "";
+  
+          if (value === 0 || dataset.data[dataIndex] !== value) return "";
+          return `${value.toFixed(2)} ${unit}`;
+        },
         color: "#000",
         font: { weight: "bold" },
       },
       legend: { position: "top" },
-      tooltip: { mode: "index", intersect: false },
+      tooltip: {
+        mode: "index",
+        intersect: false,
+        callbacks: {
+          label: function (context: any) {
+            const rawValue = typeof context.raw === "number" ? context.raw : 0;
+            const label = context.dataset.label || "Unknown";
+            const featureKey = label.toLowerCase().replace(/ /g, "_");
+            const unit = featureUnits[featureKey] || "";
+            return `${label}: ${rawValue.toFixed(2)} ${unit}`;
+          },
+        },
+      },
     },
   };
-
+  
   // -----------------------------
   // Handlers
   // -----------------------------
@@ -320,16 +390,32 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
       setSelectedFeatures((prev) => [...prev, feature]);
     }
   };
-
   const handleDownload = async (format: "png" | "pdf") => {
     if (!chartRef.current) return;
+  
     try {
-      const containerWidth = chartRef.current.scrollWidth;
-      const containerHeight = chartRef.current.scrollHeight;
-      const dataUrl = await toPng(chartRef.current, {
-        width: containerWidth,
-        height: containerHeight,
+      // Hide the download buttons before capturing
+      if (downloadRef.current) {
+        downloadRef.current.style.display = "none";
+      }
+  
+      // Wait a moment for layout to adjust
+      await new Promise((res) => setTimeout(res, 300));
+  
+      // Scroll to top so all content is visible
+      window.scrollTo(0, 0);
+  
+      // Capture chart area as canvas
+      const canvas = await html2canvas(chartRef.current, {
+        useCORS: true,
+        scrollY: -window.scrollY,
+        scale: 2, // High-res
       });
+  
+      const dataUrl = canvas.toDataURL("image/png");
+      const width = canvas.width;
+      const height = canvas.height;
+  
       if (format === "png") {
         const link = document.createElement("a");
         link.download = "patients-charts.png";
@@ -337,26 +423,34 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
         link.click();
       } else {
         const pdf = new jsPDF({
-          orientation: "p",
+          orientation: "portrait",
           unit: "px",
-          format: [containerWidth, containerHeight],
+          format: [width, height],
         });
-        pdf.addImage(dataUrl, "PNG", 0, 0, containerWidth, containerHeight);
+        pdf.addImage(dataUrl, "PNG", 0, 0, width, height);
         pdf.save("patients-charts.pdf");
       }
     } catch (err) {
-      console.error("Error generating image:", err);
+      console.error("Download error:", err);
+    } finally {
+      // Show the buttons again
+      if (downloadRef.current) {
+        downloadRef.current.style.display = "flex";
+      }
     }
   };
+  
+  
+  const downloadRef = useRef<HTMLDivElement>(null);
 
   // -----------------------------
   // Render
   // -----------------------------
   return (
-    <div ref={chartRef}>
+    <div ref={chartRef} style={{ overflow: "visible", paddingBottom: "2rem" }}>
       {/* Download Buttons */}
       <div className={styles.topActions}>
-        <div className={styles.downloadButtons}>
+      <div className={styles.downloadButtons} ref={downloadRef}>
           <button
             type="button"
             onClick={() => handleDownload("png")}
@@ -392,6 +486,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
 
       {/* Referral & AI Referral Pie Charts */}
       <div className={styles.chartContainer}>
+        {/* Referral Pie Chart */}
         <div className={styles.chartWrapper}>
           <h2 className={styles.chartTitle}>Referral Overview</h2>
           <div style={{ maxWidth: "500px", height: "500px", margin: "0 auto" }}>
@@ -399,6 +494,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
           </div>
         </div>
 
+        {/* AI Referral Pie Chart */}
         <div className={styles.chartWrapper}>
           <h2 className={styles.chartTitle}>AI Referral Overview</h2>
           <div style={{ maxWidth: "500px", height: "500px", margin: "0 auto" }}>
@@ -407,7 +503,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
         </div>
       </div>
 
-      {/* Missing Data & Key Patient Features Charts */}
+      {/* Missing Data & Key Patient Features */}
       <div
         className={styles.chartContainer}
         style={{
@@ -417,6 +513,7 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
           marginTop: "2rem",
         }}
       >
+        {/* Missing Data Bar Chart */}
         <div className={styles.chartWrapper} style={{ marginBottom: "3rem" }}>
           <h2 className={styles.chartTitle}>Missing Data</h2>
           <div style={{ width: "800px", height: "600px", margin: "0 auto" }}>
@@ -424,9 +521,10 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
           </div>
         </div>
 
+        {/* Key Patient Features */}
         <div className={styles.chartWrapper}>
           <h2 className={styles.chartTitle}>Key Patient Features</h2>
-          {/* User Guide Paragraph */}
+          {/* User Guide Paragraph inside the Key Patient Features container */}
           <div
             style={{
               margin: "1rem 0",
@@ -439,21 +537,27 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
               fontSize: "14px",
             }}
           >
+            
+            <div>
+              <p>This interactive bar chart displays the average values of up to four selected patient features, based on the data provided in the CSV file. It allows you to visually compare key clinical measurements side by side, making it easier to spot trends, identify anomalies, and support informed medical decisions.
+              </p>
+  <p>
+  For each selected feature, we calculate the average by first filtering out any missing or null values, then adding the remaining values together, and dividing by the number of valid patients for that feature. That way, the average reflects only patients with actual data.  </p>
+</div>
+
             <p>
-              The interactive bar chart presents the average values of selected patient attributes,
-              utilizing data from your feeding dashboard. This visualization facilitates quick assessment
-              and comparison of critical patient metrics, supporting informed clinical decisions.
+              <strong>Instructions for Use:</strong> Click on the attribute buttons
+              located above the chart to select or deselect specific patient metrics.
+              You may select up to four features simultaneously for comparative analysis.
+              Upon feature selection, the chart dynamically updates to display the corresponding
+              average values clearly, allowing immediate comparison of patient attributes and helping
+              in identifying trends or anomalies.
             </p>
             <p>
-              <strong>Instructions for Use:</strong> Click on the attribute buttons located above the chart to
-              select or deselect specific patient metrics. You may select up to four features simultaneously for
-              comparative analysis. Upon feature selection, the chart dynamically updates to display the
-              corresponding average values.
-            </p>
-            <p>
-              <strong>Example Scenario:</strong> To evaluate metrics such as TIDAL VOL, TIDAL VOL SPON, SIP, and PIP,
-              simply select these attributes. The bar chart will then present their average values,
-              enabling efficient analysis and interpretation of your patient cohort's respiratory parameters.
+              <strong>Example Scenario:</strong> To evaluate metrics such as TIDAL VOL, TIDAL VOL SPON,
+              SIP, and PIP concurrently, simply select these attributes. The bar chart will then present
+              their average values, enabling efficient analysis and interpretation of your patient cohort's
+              respiratory parameters.
             </p>
           </div>
 
@@ -498,8 +602,15 @@ const PatientsCharts: React.FC<PatientsChartsProps> = ({ patientsData }) => {
             </div>
           </div>
 
-          {/* Key Patient Features Bar Chart */}
-          <div style={{ width: "800px", height: "600px", margin: "0 auto", paddingLeft: "20px" }}>
+          {/* Bar Chart */}
+          <div
+            style={{
+              width: "800px",
+              height: "600px",
+              margin: "0 auto",
+              paddingLeft: "20px",
+            }}
+          >
             <Bar data={mlFeatureChartData} options={mlFeatureChartOptions} />
           </div>
         </div>

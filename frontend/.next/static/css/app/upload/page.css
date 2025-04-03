@@ -1,0 +1,92 @@
+/*!********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[5].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[5].use[3]!./src/app/upload/UploadPage.module.css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************/
+/* Upload Page Container */
+.UploadPage_container__p3ajv {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align text to the left */
+}
+
+/* Main Heading */
+.UploadPage_header__LdlfO {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 10px;
+  color: #000000;
+}
+
+/* Description Text */
+.UploadPage_instructions__T2ohb {
+  font-size: 18px;
+  text-align: left;
+  color: #333;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+/* File Input Label */
+.UploadPage_fileLabel__axeD4 {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* File Input Container */
+.UploadPage_fileInputContainer__kMcgJ {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 15px;
+  width: 100%;
+  max-width: 350px;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+
+/* Hidden File Input */
+.UploadPage_fileInput__y93SL {
+  flex-grow: 1;
+  border: none;
+  font-size: 16px;
+  background: transparent;
+  outline: none;
+}
+
+/* File Icon */
+.UploadPage_fileIcon___91iR {
+  font-size: 20px;
+  color: #000000;
+  cursor: pointer;
+}
+
+/* Upload Button */
+.UploadPage_uploadButton__9SXD4 {
+  background-color: #1d783a;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 15px;
+  transition: background 0.2s ease-in-out;
+}
+
+.UploadPage_uploadButton__9SXD4:hover {
+  background-color: #145428;
+}
+
+/* Error Message */
+.UploadPage_errorMessage__Nc50Z {
+  margin-top: 15px;
+  color: red;
+  font-size: 14px;
+}

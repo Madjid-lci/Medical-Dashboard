@@ -1,6 +1,7 @@
-import React from "react";
-import "./apd.modal.css";
+import React from "react"; // Import React
+import "./apd.module.css"; // Import modal-specific CSS
 
+// Define Patient interface for type-checking
 interface Patient {
   encounterId: number;
   end_tidal_co2: number | null;
@@ -22,28 +23,34 @@ interface Patient {
   referral: number;
 }
 
+// Define ModalProps interface for component props
 interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  selectedPatient: Patient | null;
+  isOpen: boolean;            // Whether the modal is open
+  onClose: () => void;        // Function to close the modal
+  selectedPatient: Patient | null; // Patient data to display
 }
 
+// Modal component to display detailed patient information
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, selectedPatient }) => {
+  // If modal is closed or no patient is selected, render nothing
   if (!isOpen || !selectedPatient) return null;
 
   return (
+    // Overlay that closes modal when clicked
     <div className="modal-overlay" onClick={onClose}>
+      {/* Modal content that stops propagation to prevent accidental closing */}
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* Close button */}
         <button className="modal-close" onClick={onClose}>
           ✖
         </button>
 
-        {/*  ID Section with Unique Styling */}
+        {/* ID Section with unique styling */}
         <div className="modal-header">
           <h2 className="patient-id">Patient ID: {selectedPatient.encounterId}</h2>
         </div>
 
-        {/*  Patient Details */}
+        {/* Patient Details */}
         <div className="modal-body">
           <div className="patient-detail">
             <span className="label">End Tidal CO2:</span>
@@ -110,14 +117,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, selectedPatient }) => {
             <span>{selectedPatient.bmi ?? "N/A"}</span>
           </div>
 
-          {/*  Referral Section with Color Coding (Specific for Modal) */}
+          {/* Referral Section with color coding */}
           <div className="patient-detail">
             <span className="label">Referral:</span>
             <span
               className={
                 selectedPatient.referral === 1
-                  ? "modal-need-referral"
-                  : "modal-no-referral"
+                  ? "modal-need-referral"  // Style for patients needing referral
+                  : "modal-no-referral"    // Style for patients not needing referral
               }
             >
               {selectedPatient.referral === 1 ? "Needs Referral" : "No Referral Needed"}
@@ -129,4 +136,4 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, selectedPatient }) => {
   );
 };
 
-export default Modal;
+export default Modal; // Export the Modal component

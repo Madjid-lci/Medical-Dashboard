@@ -1,0 +1,113 @@
+/*!*******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[5].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[5].use[3]!./src/app/page.module.css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************/
+/* Full-page container styling */
+.page_page__ZU32B {
+  --gray-rgb: 0, 0, 0;
+  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
+  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+
+  display: grid;
+  place-items: center; /* Centers content vertically and horizontally */
+  min-height: 100vh;
+  padding: 2rem;
+  grid-gap: 2rem;
+  gap: 2rem;
+  font-family: var(--font-geist-sans);
+}
+
+/* Main content container */
+.page_mainContent__51TpB {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Welcome Title */
+.page_title__3jonF {
+    font-size: 3rem; /* Increased font size */
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--foreground, #333);
+}
+
+/* Date Styling */
+.page_date__i6_IY {
+    font-size: 1.25rem; /* Increased date font size */
+    color: var(--gray-alpha-200, #666);
+    margin-bottom: 2rem;
+}
+
+/* Logo */
+.page_logo__7fc9l {
+  width: 300px;  /* Increased logo width */
+  height: 300px; /* Increased logo height */
+  background-image: url(/_next/static/media/CCU-Logo.4146ae91.jpg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: 2rem auto;
+}
+
+/* Button Group */
+.page_buttonGroup__hF6kk {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Buttons */
+.page_mainButton__5IIb_ {
+    background-color: #000;
+    color: #fff;
+    padding: 1rem 2rem;  /* Larger button padding */
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.page_mainButton__5IIb_:hover {
+    opacity: 0.8;
+}
+
+/* Enable Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .page_page__ZU32B {
+    --gray-rgb: 255, 255, 255;
+    --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
+    --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
+    --button-primary-hover: #ccc;
+    --button-secondary-hover: #1a1a1a;
+  }
+
+  .page_title__3jonF {
+    color: var(--gray-rgb);
+  }
+
+  .page_date__i6_IY {
+    color: var(--gray-alpha-200);
+  }
+
+  .page_logo__7fc9l {
+    filter: invert();
+  }
+}
+
+@media (max-width: 600px) {
+  .page_page__ZU32B {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .page_mainButton__5IIb_ {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+

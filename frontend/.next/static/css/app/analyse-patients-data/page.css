@@ -1,0 +1,533 @@
+/*!****************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[5].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[5].use[3]!./src/app/analyse-patients-data/apd.module.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************/
+/* ========================
+   UPLOAD PAGE STYLING
+======================== */
+
+/* Container */
+.apd_container__nOVKW {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align text to the left */
+  align-items: center; /* Center all items horizontally */
+}
+
+/* Main Heading */
+.apd_header__Na77P {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 10px;
+  color: #000000;
+}
+
+/* File Input Label */
+.apd_fileLabel__TnbSu {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* File Input */
+.apd_fileInput__56VMT {
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 16px;
+  background: transparent;
+  outline: none;
+}
+
+/* Upload Button */
+.apd_uploadButton__m_px9 {
+  background-color: #1d783a;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  transition: background 0.2s ease-in-out;
+}
+.apd_uploadButton__m_px9:hover {
+  background-color: #145428;
+}
+
+/* Error & Success Messages */
+.apd_errorMessage__1LKOu {
+  margin-top: 15px;
+  color: red;
+  font-size: 14px;
+}
+.apd_successMessage__SQZHb {
+  margin-top: 15px;
+  color: green;
+  font-size: 14px;
+}
+
+/* Referral Summary */
+.apd_summary__xQrtZ {
+  margin-top: 20px;
+  width: 100%;
+}
+.apd_summary__xQrtZ h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.apd_summary__xQrtZ p {
+  font-size: 16px;
+}
+
+/* ========================
+   CONTROL CONTAINER
+======================== */
+.apd_controlContainer__58Ju7 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+  width: 100%;
+}
+
+.apd_filterContainer__uK4lk,
+.apd_sortSearchContainer__tc5Bk {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ========================
+   SEARCH & SORT
+======================== */
+.apd_searchInput__3c75G {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
+}
+.apd_searchInput__3c75G:focus {
+  border-color: #007bff;
+}
+
+.apd_exactMatchLabel__35axx {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+.apd_exactMatchCheckbox__mcpuc {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Filter Toggle Button */
+.apd_filterToggleButton__L5J9w {
+  background-color: #007bff;
+  border: 1px solid #007bff;
+  color: white;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.apd_filterToggleButton__L5J9w:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Filter Buttons */
+.apd_filterButton__V_0Pt {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+.apd_filterButton__V_0Pt:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+}
+.apd_filterButton__V_0Pt.apd_active__rAgIK {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+.apd_filterButton__V_0Pt:disabled {
+  background-color: #ccc;
+  color: #777;
+  cursor: not-allowed;
+}
+
+/* Blue Button Modifier */
+.apd_blueButton__FZ_Fy {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+}
+.apd_blueButton__FZ_Fy:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* ========================
+   ADVANCED FILTER CONTAINER
+======================== */
+.apd_advancedFilterContainer__wl8DL {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  margin-bottom: 40px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  flex-wrap: wrap; /* Allows filters to wrap if needed */
+}
+
+/* ========================
+   FILTER FIELD
+======================== */
+.apd_filterField__GfUpo {
+  display: flex;
+  flex-direction: column;
+}
+.apd_filterField__GfUpo label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #555;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.apd_filterField__GfUpo input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  height: 36px;
+}
+.apd_filterField__GfUpo input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* ========================
+   FILTER BUTTON CONTAINER & APPLY/Reset FILTER BUTTONs
+======================== */
+.apd_filterButtonContainer__u0bob {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 20px !important;
+  width: 100%;
+  margin-top: 20px;
+  /* Force full width within grid */
+  grid-column: 1 / -1; /* This makes it span all grid columns */
+  background: inherit; /* Match parent background */
+  padding: 10px 0; /* Add vertical spacing */
+}
+
+/* Clean up the button itself */
+.apd_applyFilterButton__e4Kwt {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  order: 0 !important;
+  position: static !important;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.apd_applyFilterButton__e4Kwt:hover {
+  background-color: #0056b3;
+}
+
+/* Reset Filter Button */
+.apd_resetFilterButton__ou5Ql {
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  /* Remove absolute positioning */
+  order: 0 !important;
+  position: static !important;
+}
+.apd_resetFilterButton__ou5Ql:hover {
+  background-color: #c82333;
+}
+
+/* ========================
+   TABLE STYLING
+======================== */
+.apd_tableWrapper__EV8aW {
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.apd_tableScrollContainer__JG3t_ {
+  overflow-x: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-width: 100%;
+}
+.apd_patientsTable__BzzTb {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: center;
+  background-color: #fafafa;
+}
+.apd_patientsTable__BzzTb th,
+.apd_patientsTable__BzzTb td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  overflow-wrap: break-word;
+}
+.apd_patientsTable__BzzTb th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Row Background Colors */
+.apd_patientsTable__BzzTb .apd_evenRow__hvHUm td {
+  background-color: #fafafa;
+}
+.apd_patientsTable__BzzTb .apd_oddRow__lA_tj td {
+  background-color: #ffffff;
+}
+
+/* Sticky Referral Column */
+.apd_patientsTable__BzzTb th.apd_stickyColumn__rM8ol,
+.apd_patientsTable__BzzTb td.apd_stickyColumn__rM8ol {
+  position: -webkit-sticky;
+  position: sticky;
+  right: 0; /* Pinned to the right edge of the scroll container */
+  z-index: 2;
+  min-width: 120px;
+  box-shadow: inset 0 -1px 0 #ccc;
+}
+.apd_evenRow__hvHUm .apd_stickyColumn__rM8ol {
+  background-color: #fafafa;
+}
+.apd_oddRow__lA_tj .apd_stickyColumn__rM8ol {
+  background-color: #ffffff;
+}
+
+/* Row Border Fix */
+.apd_patientsTable__BzzTb tr {
+  position: relative;
+  z-index: 1;
+}
+.apd_patientsTable__BzzTb th,
+.apd_patientsTable__BzzTb td {
+  border-bottom: 1px solid #ccc;
+}
+
+/* Referral Prediction Badges */
+.apd_needReferral____Tcj {
+  color: #ffffff;
+  background-color: #ff3b30; /* Bright red */
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: bold;
+  display: inline-block;
+}
+.apd_noReferral__kK_EX {
+  color: #ffffff;
+  background-color: #32d74b; /* Bright green */
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+/* Sticky "More Data" Column */
+.apd_patientsTable__BzzTb th.apd_moreDataColumn__N5Fba,
+.apd_patientsTable__BzzTb td.apd_moreDataColumn__N5Fba {
+  position: -webkit-sticky;
+  position: sticky;
+  right: 120px; /* Offset by the width of the referral column */
+  z-index: 2;
+  min-width: 150px;
+  text-align: center;
+  border-left: 1px solid #ccc;
+  box-shadow: inset 0 -1px 0 #ccc;
+}
+.apd_evenRow__hvHUm .apd_moreDataColumn__N5Fba {
+  background-color: #fafafa;
+}
+.apd_oddRow__lA_tj .apd_moreDataColumn__N5Fba {
+  background-color: #ffffff;
+}
+
+/* More Link */
+.apd_moreLink__rDUei {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s ease;
+}
+.apd_moreLink__rDUei:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+/* ========================
+   PAGINATION STYLING
+======================== */
+.apd_pagination__bIH9x {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.apd_pagination__bIH9x button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.apd_pagination__bIH9x button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+.apd_pagination__bIH9x button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.apd_pagination__bIH9x span {
+  font-size: 14px;
+  font-weight: bold;
+}
+.apd_paginationInput__h8di7 {
+  width: 50px;
+  padding: 4px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  height: 30px;
+  line-height: 30px;
+}
+.apd_paginationInput__h8di7:focus {
+  border-color: #007bff;
+}
+.apd_paginationText__6ly0A {
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+}
+.apd_paginationText__6ly0A:hover {
+  color: #007bff;
+}
+
+/* ========================
+   ENCOUNTER ID STYLING
+======================== */
+.apd_evenRow__hvHUm td.apd_encounterIdColumn__2PnY8 {
+  background-color: #f5f5f5;
+}
+.apd_oddRow__lA_tj td.apd_encounterIdColumn__2PnY8 {
+  background-color: #fbfbfb;
+}
+th.apd_encounterIdColumn__2PnY8,
+td.apd_encounterIdColumn__2PnY8 {
+  background-color: #f1f1f1;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Summary Container */
+.apd_summaryContainer__petMl {
+  width: 50%;
+  margin: 20px auto; /* Centers the container horizontally */
+  text-align: center;
+}
+
+/* Referral Summary Heading */
+.apd_summaryHeading__gU_da {
+  margin-bottom: 10px;
+  font-size: 26px;
+  font-weight: bolder;
+  text-align: center;
+}
+
+/* Referral Summary Items Container */
+.apd_summaryItems__373Cb {
+  gap: 20px;
+  display: flex;
+  justify-content: space-around; /* Places items side by side */
+  align-items: center;
+}
+
+.apd_separator__CcV8n {
+  width: 100%;
+  border: none;
+  border-top: 2px solid #ddd;
+  margin: 25px 0;
+  margin-bottom: -15px;
+}
+
+/* ========================
+   RESPONSIVENESS
+======================== */
+@media (max-width: 768px) {
+  .apd_referralButtonsContainer__HSEPJ {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .apd_filter-field__5RwSH input {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .apd_applyFilterButton__e4Kwt .apd_reset-filter-button__gfnE5 {
+    width: 100%; /* ✅ Make the button responsive for smaller screens */
+    margin-top: 12px;
+  }
+
+  .apd_filterButtonContainer__u0bob {
+    flex-direction: column;
+    gap: 10px !important;
+  }
+}

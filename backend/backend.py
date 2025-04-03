@@ -1,57 +1,51 @@
-from flask import Flask, request, jsonify
-import pandas as pd
-import os
-import numpy as np  # ✅ Import NumPy to handle NaN values
-from flask_cors import CORS  
+from flask import Flask, request, jsonify  # Import Flask essentials
+import pandas as pd  # For CSV data handling
+import os  # For file system operations
+import numpy as np  # Handle numerical operations and NaN values
+from flask_cors import CORS  # Enable Cross-Origin Resource Sharing
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins
+app = Flask(__name__)  # Create Flask app instance
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow CORS for all routes and origins
 
-# ✅ Set MAX CONTENT LENGTH to 50MB
-MAX_FILE_SIZE_MB = 50  
-app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE_MB * 1024 * 1024  
+MAX_FILE_SIZE_MB = 50  # Max file size in MB
+app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE_MB * 1024 * 1024  # Set max content length in bytes
 
-print(f"🚀 Flask Server Starting... MAX FILE SIZE: {app.config['MAX_CONTENT_LENGTH']} bytes")
+print(f"Flask Server Starting... MAX FILE SIZE: {app.config['MAX_CONTENT_LENGTH']} bytes")
 
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+UPLOAD_FOLDER = "uploads"  # Folder for file uploads
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Ensure upload folder exists
 
-# ✅ Initialize `patients_data` as an empty list at the beginning
-patients_data = []  
+patients_data = []  # Global list to store patient records
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    return jsonify({"error": f"Uploaded file is too large. Max size is {MAX_FILE_SIZE_MB}MB."}), 413
+    return jsonify({"error": f"Uploaded file is too large. Max size is {MAX_FILE_SIZE_MB}MB."}), 413  # Error for oversized files
 
 @app.before_request
 def log_request_info():
-    print(f"🔍 Incoming Request: {request.method} {request.path} | Content Length: {request.content_length}")
+    print(f"Incoming Request: {request.method} {request.path} | Content Length: {request.content_length}")  # Log request info
 
 @app.route("/upload-csv", methods=["POST"])
 def upload_csv():
-    global patients_data  # ✅ Use global variable
+    global patients_data  # Use global patient data list
 
     if "file" not in request.files:
-        print("⚠️ No file uploaded!")
-        return jsonify({"error": "No file uploaded"}), 400
+        print("No file uploaded!")
+        return jsonify({"error": "No file uploaded"}), 400  # Error if no file part
 
     file = request.files["file"]
     if file.filename == "":
-        print("⚠️ No selected file!")
-        return jsonify({"error": "No selected file"}), 400
+        print("No selected file!")
+        return jsonify({"error": "No selected file"}), 400  # Error if file not selected
 
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(file_path)
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)  # Define file path
+    file.save(file_path)  # Save uploaded file
 
     try:
-        df = pd.read_csv(file_path)
-        print(f"✅ CSV File '{file.filename}' Loaded Successfully! Rows: {len(df)}")
-
-        # ✅ Convert NaN values to `None` to avoid JSON issues
-        df = df.replace({np.nan: None})
-
-        # ✅ Store patient data globally
-        patients_data = df.to_dict(orient="records")
+        df = pd.read_csv(file_path)  # Load CSV into DataFrame
+        print(f"CSV File '{file.filename}' Loaded Successfully! Rows: {len(df)}")
+        df = df.replace({np.nan: None})  # Replace NaN with None
+        patients_data = df.to_dict(orient="records")  # Update global patient data list
 
         return jsonify({"message": "File uploaded successfully", "total_patients": len(patients_data)}), 200
 
@@ -64,15 +58,15 @@ def upload_csv():
 
 @app.route("/patients", methods=["GET"])
 def get_patients():
-    global patients_data  # ✅ Make sure this is defined
+    global patients_data  # Access global patient data
 
     if not patients_data:
-        print("⚠️ No patient data available!")
-        return jsonify({"error": "No data available"}), 404  
+        print("No patient data available!")
+        return jsonify({"error": "No data available"}), 404  # Error if no data found
 
-    print(f"✅ Returning {len(patients_data)} patients data")
-    return jsonify({"patients": patients_data})
+    print(f"Returning {len(patients_data)} patients data")
+    return jsonify({"patients": patients_data})  # Return patient records
 
 if __name__ == "__main__":
-    print("🚀 Backend Server is Running on http://0.0.0.0:4000...")
-    app.run(debug=True, host="0.0.0.0", port=4000)
+    print("Backend Server is Running on http://0.0.0.0:4000...")
+    app.run(debug=True, host="0.0.0.0", port=4000)  # Start server

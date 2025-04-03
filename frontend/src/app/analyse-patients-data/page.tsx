@@ -1,12 +1,15 @@
-"use client";
+"use client"; // Enable client-side rendering in Next.js
 
-import React, { useState, useEffect } from "react";
-import styles from "./apd.module.css";
-import Modal from "./apd.modal";
+import React, { useState, useEffect } from "react"; // Import React and hooks
+import styles from "./apd.module.css"; // Import component-specific CSS module
+import Modal from "./apd.modal"; // Import the Modal component
 
+// Define backend URL from environment variable or default to localhost
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000";
+// Define number of patients to display per page
 const PATIENTS_PER_PAGE = 10;
 
+// Patient interface to type-check patient data
 interface Patient {
   encounterId: number;
   end_tidal_co2: number | null;
@@ -28,6 +31,7 @@ interface Patient {
   referral: number;
 }
 
+// Default columns for display in the table
 const DEFAULT_COLUMNS: (keyof Patient)[] = [
   "encounterId",
   "feed_vol",
@@ -37,13 +41,16 @@ const DEFAULT_COLUMNS: (keyof Patient)[] = [
 ];
 
 export default function UploadPage() {
+  // File upload state
   const [file, setFile] = useState<File | null>(null);
+  // Message and error states for upload feedback
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
+  // Patients data state and loading indicator
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Filter & Pagination states
+  // Filter & pagination states
   const [filter, setFilter] = useState<"all" | "needReferral" | "noReferral">("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [inputPage, setInputPage] = useState<string>("1");
@@ -51,10 +58,10 @@ export default function UploadPage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [exactMatch, setExactMatch] = useState(false);
 
-  // Toggle for filter container
+  // Toggle to show/hide advanced filter container
   const [showFilterContainer, setShowFilterContainer] = useState(false);
 
-  // Range filtering
+  // Range filtering states for advanced filtering inputs
   const [rawInput, setRawInput] = useState<{ [key in keyof Patient]?: [string, string] }>({});
   const [pendingRangeFilters, setPendingRangeFilters] = useState<{
     [key in keyof Patient]?: [number | null, number | null];
@@ -63,28 +70,29 @@ export default function UploadPage() {
     [key in keyof Patient]?: [number | null, number | null];
   }>({});
 
-  // Modal
+  // Modal state and selected patient for displaying details
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
 
-  // Store min/max for each numeric column
+  // Store min and max values for each numeric patient column for filtering purposes
   const [minMaxValues, setMinMaxValues] = useState<{
     [key in keyof Patient]?: [number | null, number | null];
   }>({});
 
-  // Referral summary (returned from backend)
+  // Referral summary returned from the backend
   const [referralSummary, setReferralSummary] = useState<{
     referred: number;
     not_referred: number;
   } | null>(null);
 
-  // Calculate min/max for each numeric column in patients
+  // Recalculate min/max values when patients data changes
   useEffect(() => {
     if (patients.length > 0) {
       calculateMinMaxValues(patients);
     }
   }, [patients]);
 
+  // Function to calculate min and max for each numeric column across patients data
   const calculateMinMaxValues = (patientsData: Patient[]) => {
     const values: { [key in keyof Patient]?: [number | null, number | null] } = {};
 
@@ -104,13 +112,10 @@ export default function UploadPage() {
         }
       }
     });
-
     setMinMaxValues(values);
   };
 
-  // ==============================
-  //  CSV UPLOAD & SET PATIENTS
-  // ==============================
+  // Handle file input change event
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFile(e.target.files[0]);
@@ -119,9 +124,10 @@ export default function UploadPage() {
     }
   };
 
+  // Handle CSV upload to backend
   const handleUpload = async () => {
     if (!file) {
-      setError("⚠ Please select a CSV file.");
+      setError("Please select a CSV file.");
       return;
     }
 
@@ -146,47 +152,50 @@ export default function UploadPage() {
 
       const result = await response.json();
 
+      // If sample_data is returned, update patients and referral summary
       if (Array.isArray(result.sample_data)) {
         setPatients(result.sample_data);
         setReferralSummary(result.referral_summary || null);
-        setMessage(result.message || "✅ Predictions generated successfully!");
+        setMessage(result.message || "Predictions generated successfully!");
       } else {
         throw new Error("No predictions (sample_data) received from server.");
       }
     } catch (err) {
       console.error(err);
-      setError("⚠ Upload failed. Please try again.");
+      setError("Upload failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // =========================
-  //  FILTERING & PAGINATION
-  // =========================
+  // Apply pending range filters and reset pagination
   const handleApplyFilters = () => {
     setAppliedFilters(pendingRangeFilters);
     setCurrentPage(1);
     setRawInput({});
   };
 
+  // Validate and update pending filters when raw input loses focus
   const handleRawInputBlur = (key: keyof Patient, index: number) => {
     setPendingRangeFilters((prev) => {
       const updated = { ...prev };
       let newMin = parseFloat(rawInput[key]?.[0] || "") || null;
       let newMax = parseFloat(rawInput[key]?.[1] || "") || null;
 
+      // Clamp newMin and newMax to allowed min/max values
       if (newMin !== null && minMaxValues[key]?.[0] !== undefined) {
         newMin = Math.max(newMin, minMaxValues[key]![0]!);
       }
       if (newMax !== null && minMaxValues[key]?.[1] !== undefined) {
         newMax = Math.min(newMax, minMaxValues[key]![1]!);
       }
+      // Swap if min is greater than max
       if (newMin !== null && newMax !== null && newMin > newMax) {
         [newMin, newMax] = [newMax, newMin];
       }
 
       updated[key] = [newMin, newMax];
+      // Update raw input state with clamped values for display
       setRawInput((prevRaw) => ({
         ...prevRaw,
         [key]: [newMin?.toString() || "", newMax?.toString() || ""],
@@ -195,6 +204,7 @@ export default function UploadPage() {
     });
   };
 
+  // Update raw input state for pending range filters on change
   const handlePendingRangeChange = (key: keyof Patient, index: number, value: string) => {
     setRawInput((prev) => ({
       ...prev,
@@ -204,9 +214,7 @@ export default function UploadPage() {
     }));
   };
 
-  // =======================
-  //  FILTER PATIENTS
-  // =======================
+  // Filter patients based on referral, search query, and applied range filters
   const filteredPatients = patients.filter((patient) => {
     const matchesFilter =
       filter === "all" ||
@@ -229,18 +237,18 @@ export default function UploadPage() {
     return matchesFilter && matchesSearch && matchesRange;
   });
 
-  // =====================
-  //  PAGINATION LOGIC
-  // =====================
+  // Calculate total pages and slice current patients based on current page
   const totalPages = Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE);
   const indexOfLastPatient = currentPage * PATIENTS_PER_PAGE;
   const indexOfFirstPatient = indexOfLastPatient - PATIENTS_PER_PAGE;
   const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient);
 
+  // Handle page input change
   const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputPage(e.target.value);
   };
 
+  // Submit page change on Enter key, ensuring page number is within bounds
   const handlePageSubmit = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       const newPage = Math.min(Math.max(1, parseInt(inputPage) || 1), totalPages);
@@ -249,52 +257,42 @@ export default function UploadPage() {
     }
   };
 
+  // Update current page when page input loses focus
   const handlePageBlur = () => {
     const newPage = Math.min(Math.max(1, parseInt(inputPage) || 1), totalPages);
     setCurrentPage(newPage);
     setIsEditingPage(false);
   };
 
+  // Enable editing mode for page input
   const handlePageClick = () => {
     setIsEditingPage(true);
   };
 
-  // =========================
-  //  MODAL HANDLERS
-  // =========================
-  const handleOpenModal = (patient: Patient) => {
-    setSelectedPatient(patient);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPatient(null);
-  };
-
+  // Reset all filters, referral type, and search query to default
   const handleResetFilters = () => {
-    // Reset advanced filters and also referral type and search query if needed.
     setAppliedFilters({});
     setPendingRangeFilters({});
     setRawInput({});
     setFilter("all");
     setSearchQuery("");
-    // Optionally, reset sortOrder or any other filter states if desired.
+    // Optionally, reset sort order or other filter states if needed
   };
 
-  // Extract visible columns from filters
-const extraFilterColumns = Object.keys(appliedFilters).filter(
-  (key) => !DEFAULT_COLUMNS.includes(key as keyof Patient) &&
-    appliedFilters[key as keyof Patient]?.some((val) => val !== null)
-) as (keyof Patient)[];
+  // Extract extra columns to display based on applied range filters (excluding default columns)
+  const extraFilterColumns = Object.keys(appliedFilters).filter(
+    (key) =>
+      !DEFAULT_COLUMNS.includes(key as keyof Patient) &&
+      appliedFilters[key as keyof Patient]?.some((val) => val !== null)
+  ) as (keyof Patient)[];
 
-// Insert extra columns after BMI
-const visibleColumns: (keyof Patient)[] = (() => {
-  const bmiIndex = DEFAULT_COLUMNS.indexOf("bmi") + 1;
-  const copy = [...DEFAULT_COLUMNS];
-  copy.splice(bmiIndex, 0, ...extraFilterColumns);
-  return copy;
-})();
+  // Insert extra columns after the BMI column into the visible columns list
+  const visibleColumns: (keyof Patient)[] = (() => {
+    const bmiIndex = DEFAULT_COLUMNS.indexOf("bmi") + 1;
+    const copy = [...DEFAULT_COLUMNS];
+    copy.splice(bmiIndex, 0, ...extraFilterColumns);
+    return copy;
+  })();
 
   return (
     <div className={styles.container}>

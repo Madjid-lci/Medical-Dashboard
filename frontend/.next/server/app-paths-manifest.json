@@ -1,0 +1,8 @@
+{
+  "/patients-referrals/page": "app/patients-referrals/page.js",
+  "/analyse-patients-data/page": "app/analyse-patients-data/page.js",
+  "/reports/page": "app/reports/page.js",
+  "/upload/page": "app/upload/page.js",
+  "/page": "app/page.js",
+  "/help/page": "app/help/page.js"
+}
